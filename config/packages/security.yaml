@@ -1,0 +1,48 @@
+security:
+    password_hashers:
+        App\Entity\Users:
+            algorithm: auto
+
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\Users
+                property: username
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            lazy: true
+            provider: app_user_provider
+            stateless: true  # Ajout de stateless: true
+
+        login:
+            pattern: ^/api/login
+            stateless: true
+            json_login:
+                check_path: /api/login   # Correction du che70c63249db6b642fbecf1b4c19e70ec300f9d2a32df6cee80b5b69f6b138dd5bmin
+                username_path: email      # Clé pour le champ email dans le JSON
+                password_path: psw        # Clé pour le champ password dans le JSON
+
+        api:
+            pattern: ^/api/
+            stateless: true
+            jwt: ~
+
+    access_control:
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
+        - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
+        - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4  # Valeur la plus basse pour bcrypt
+                time_cost: 3  # Valeur la plus basse pour securityargon
+                memory_cost: 10  # Valeur la plus basse pour argon
