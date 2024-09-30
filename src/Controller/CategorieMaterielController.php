@@ -32,7 +32,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Categorie modifier'], 200, []);
         }
 
-        #[Route('/api/Categorie/supprimer/{id}',name:'suppresseion_Categorie',methods:'POST')]
+        #[Route('/api/Categorie/supprimer/{id}',name:'suppresseion_Categorie',methods:'DELETE')]
         public function supprimer(CategorieMateriel $Categorie,Request $request, EntityManagerInterface $em){
             $em->remove($Categorie);
             $em->flush();

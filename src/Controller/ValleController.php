@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Attribute\Route;
             return $this->json(['message' => 'Valle modifier'], 200, []);
         }
 
-        #[Route('/api/valle/supprimer/{id}',name:'suppresseion_valle',methods:'POST')]
+        #[Route('/api/valle/supprimer/{id}',name:'suppresseion_valle',methods:'DELETE')]
         public function supprimer(Vallee $valle,Request $request, EntityManagerInterface $em){
             $em->remove($valle);
             $em->flush();

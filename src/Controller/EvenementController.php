@@ -8,6 +8,7 @@ use App\Repository\TypeEvenementRepository;
 use App\Repository\UsersRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,12 +19,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class EvenementController extends AbstractController
 {
     #[Route('api/evenement',name:'insertion_evenement',methods:'POST')]
-    public function insertion(EntityManagerInterface $em,Request $request,UsersRepository $usersRepository,AssociationRepository $associationRepository,TypeEvenementRepository $typeEvenementRepository): JsonResponse
+    public function insertion(EntityManagerInterface $em,Request $request,UsersRepository $usersRepository,AssociationRepository $associationRepository,TypeEvenementRepository $typeEvenementRepository,JWTEncoderInterface $jWTEncoderInterface): JsonResponse
     {
         $evenement = new Evenement();
         $data = $request->getContent();
         $data_decode = json_decode($data,true);
-        $utilisateur = $usersRepository->find($data_decode['user_id']);
+        $decode = $jWTEncoderInterface->decode($data_decode['user_id']);
+        $utilisateur = $usersRepository->findOneBy(['username'=>$decode['username']]);
         $association = $associationRepository->find($data_decode['association_id']);
         $typeEvenement = $typeEvenementRepository->find($data_decode['typeEvenement_id']);
         $evenement

@@ -11,6 +11,7 @@ use App\Repository\UsersRepository;
 use App\Service\InvestigationMateriel;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -18,11 +19,12 @@ use Symfony\Component\Routing\Attribute\Route;
     class DonnationMaterielController extends AbstractController{
 
         #[Route('/api/DonnationMateriel',name:'insetion_DonnationMateriel',methods:'POST')]
-        public function inerer(Request $request, EntityManagerInterface $em , UsersRepository $usersRepository, MaterielRepository $materielrepository,TresorerieService $tresorerieService){
+        public function inerer(Request $request, EntityManagerInterface $em , UsersRepository $usersRepository, MaterielRepository $materielrepository,TresorerieService $tresorerieService,JWTEncoderInterface $jWTEncoderInterface){
             $DonnationMateriel = new DonnationMateriel();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $user = $usersRepository->find($data_decode['utilisateur']);
+            $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
+            $user = $usersRepository->findOneBy(['username'=>$decode['username']]);
             $materiel = $materielrepository->find($data_decode['id_materiel_id']);
             $DonnationMateriel->setNomDonnateurMateriel($data_decode['nom_donnateur_materiel']);
             $DonnationMateriel->setDateAcquisition(new \DateTime());

@@ -41,7 +41,7 @@ class MaterielController extends AbstractController
             return $this->json(['message' => 'Materiel modifier'], 200, []);
         }
 
-        #[Route('/api/Materiel/supprimer/{id}',name:'suppresseion_Materiel',methods:'POST')]
+        #[Route('/api/Materiel/supprimer/{id}',name:'suppresseion_Materiel',methods:'DELETE')]
         public function supprimer(Materiel $Materiel,Request $request, EntityManagerInterface $em){
             $em->remove($Materiel);
             $em->flush();

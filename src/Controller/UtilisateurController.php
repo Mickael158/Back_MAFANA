@@ -65,35 +65,24 @@ class UtilisateurController extends AbstractController
     //     }
     // }
     #[Route('/api/login', name: 'login', methods: ['POST'])]
-    public function Authentification(JWTEncoderInterface $jWTEncoderInterface,UsersRepository $UserRepository, Request $Request, PersonneMembreRepository $PersonneMembreRepository , JWTTokenManagerInterface $jWTTokenManagerInterface,UserPasswordHasherInterface $hasher)
+    public function Authentification()
     {
-        $data = $Request->getContent();
+        
+    }
+
+    #[Route('/api/decode', name: 'decode', methods: ['POST'])]
+    public function decodeToken(JWTEncoderInterface $jWTEncoderInterface,Request $request)
+    {
+        $data= $request->getContent();
         $data_decode = json_decode($data, true);
-        $username = $data_decode['username'];
-        $password = $data_decode['password'];
-        $Utilisateur = $UserRepository->findOneBy(['username' => $username]);
-        if ($Utilisateur) {
-            if($hasher->isPasswordValid($Utilisateur, $password)){
-                $token = $jWTTokenManagerInterface->create($Utilisateur);
-                $decodedData = $jWTEncoderInterface->decode($token);
-                return $this->json(['data' => $decodedData], 200, []);
-            }else{
-                return $this->json(['message' => 'Votre mot de passe est incorrect.'], 403, []);
-            }
-        } else {
-            return $this->json(['message' => 'Username incorrect.'], 403, []);
+
+        try {
+            $decodedData = $jWTEncoderInterface->decode($data_decode['token']);
+            return $this->json($decodedData['username'],200,[]);
+        } catch (\Exception $e) {
+            return null;
         }
     }
-    // public function decodeToken(JWTEncoderInterface $jWTEncoderInterface, string $token)
-    // {
-    //     try {
-    //         $decodedData = $jWTEncoderInterface->decode($token);
-    //         return $decodedData;
-    //     } catch (\Exception $e) {
-    //         // Gestion des erreurs, par exemple token invalide
-    //         return null;
-    //     }
-    // }
 
     #[Route('/api/session-user', name: 'session_user', methods: ['GET'])]
     public function printSessionUser(SessionInterface $SESSION): Response

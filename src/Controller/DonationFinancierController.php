@@ -9,6 +9,7 @@ use App\Repository\UsersRepository;
 use App\Service\InvestigationFinancier;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,13 +17,14 @@ use Symfony\Component\Routing\Attribute\Route;
     class DonationFinancierController extends AbstractController{
 
         #[Route('/api/DonationFinancier',name:'insetion_DonationFinancier',methods:'POST')]
-        public function inerer(Request $request, EntityManagerInterface $em , UsersRepository $usersRepository,TresorerieService $tresorerieService){
+        public function inerer(Request $request, EntityManagerInterface $em , UsersRepository $usersRepository,TresorerieService $tresorerieService,JWTEncoderInterface $jWTEncoderInterface){
             $em->beginTransaction();    
             try {
             $DonationFinancier = new DonationFinancier();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $user = $usersRepository->find($data_decode['utilisateur']);
+            $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
+            $user = $usersRepository->findOneBy(['username'=>$decode['username']]);
             $DonationFinancier->setNomDonationFinancier($data_decode['nom_donation_financier']);
             $DonationFinancier->setDateDonationFinancier(new \DateTime());
             $DonationFinancier->setMontant($data_decode['montant']);

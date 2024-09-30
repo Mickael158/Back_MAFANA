@@ -9,6 +9,7 @@ use App\Repository\PrixCotisationRepository;
 use App\Repository\UsersRepository;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,12 +17,13 @@ use Symfony\Component\Routing\Attribute\Route;
     class PayementCotisationController extends AbstractController{
 
         #[Route('/api/Payement',name:'Nouveau_Enfant',methods:'POST')]
-        public function insertionPayement(Request $request,EntityManagerInterface $em,UsersRepository $usersRepository,PersonneMembreRepository $personneMembre,TresorerieService $tresorerieService){
+        public function insertionPayement(Request $request,EntityManagerInterface $em,UsersRepository $usersRepository,PersonneMembreRepository $personneMembre,TresorerieService $tresorerieService,JWTEncoderInterface $jWTEncoderInterface){
             $em->beginTransaction();    
             try {
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $user = $usersRepository->find($data_decode['utilisateur']);
+            $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
+            $user = $usersRepository->findOneBy(['username'=>$decode['username']]);
             $Devis = $data_decode['data'];
             $montants = 0;
             for($i = 0 ; $i < count($Devis) ; $i++) {

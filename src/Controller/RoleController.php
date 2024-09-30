@@ -30,7 +30,7 @@ use Symfony\Component\Routing\Attribute\Route;
             return $this->json(['message' => 'Role modifier'], 200, []);
         }
 
-        #[Route('/api/Role/supprimer/{id}',name:'suppresseion_Role',methods:'POST')]
+        #[Route('/api/Role/supprimer/{id}',name:'suppresseion_Role',methods:'DELETE')]
         public function supprimer(Role $Role,Request $request, EntityManagerInterface $em){
             $em->remove($Role);
             $em->flush();

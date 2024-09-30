@@ -5,6 +5,7 @@ use App\Entity\PrixCotisation;
 use App\Repository\PrixCotisationRepository;
 use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -13,19 +14,18 @@ use Symfony\Component\Routing\Annotation\Route;
 class PrixCotisationController extends AbstractController
 {
     #[Route('/api/PrixCotisation', name: 'insertion_PrixCotisation', methods: ['POST'])]
-    public function inserer(Request $request, EntityManagerInterface $em, UsersRepository $usersRepository)
+    public function inserer(Request $request, EntityManagerInterface $em, UsersRepository $usersRepositoryr,JWTEncoderInterface $jWTEncoderInterface)
     {
         $PrixCotisation = new PrixCotisation();
         $data = $request->getContent();
         $data_decode = json_decode($data, true);
+        $decode = $jWTEncoderInterface->decode($data_decode['Utilisateur']);
+        $user = $usersRepositoryr->findOneBy(['username' => $decode['username']]);
 
-        // Récupération de l'utilisateur de la session
-        $Utilisateur = $usersRepository->find($data_decode['Utilisateur']);
-
-        if ($Utilisateur) {
+        if ($user) {
             $PrixCotisation->setValeur($data_decode['Valeur'])
                 ->setDateModif(new \DateTime($data_decode['DateModif']))
-                ->setIdUtilisateur($Utilisateur);
+                ->setIdUtilisateur($user);
 
             $em->persist($PrixCotisation);
             $em->flush();
