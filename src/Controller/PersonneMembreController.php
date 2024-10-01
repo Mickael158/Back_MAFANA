@@ -1,6 +1,7 @@
 <?php
     namespace App\Controller;
 
+use App\Entity\DemandeFinancier;
 use App\Entity\PersonneMembre;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\PersonneMembreRepository;
@@ -88,14 +89,24 @@ use Symfony\Component\Routing\Attribute\Route;
         {
             return $this->json($personneMembreRepository->getPersIndep() , 200, []);
         }
-        #[Route('/api/Etat',name:'insetion_DemandeFinacier',methods:'GET')]
+        #[Route('/api/getPersIndepNotUser', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
+        public function Personne_independant_not_user(PersonneMembreRepository $personneMembreRepository)
+        {
+            return $this->json($personneMembreRepository->getPersIndepNotUser() , 200, []);
+        }
+        #[Route('/api/getPersNotQuitte', name: 'selectId_Personne_not_quitte', methods: ['GET'])]
+        public function Personne_independant_not_quitte(PersonneMembreRepository $personneMembreRepository)
+        {
+            return $this->json($personneMembreRepository->getPersNotQuitte() , 200, []);
+        }
+        #[Route('/api/Etats',name:'insetion_DemandeFinacier',methods:'GET')]
         public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
             $personneAll = $personneMembreRepository->findAll();
-            
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $demandeFinancierRepository->pourcentage($personneAll[$i]->getId());
+                $pourcentage = $this->pourcentageAA(2, $personneMembreRepository, $demandeFinancierRepository);
+                dd($pourcentage);
                 $personne = $personneMembreRepository->find($personneAll[$i]->getId());
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
@@ -103,4 +114,39 @@ use Symfony\Component\Routing\Attribute\Route;
             }
             return $this->json($personnefin, 200, []);
         }
+        #[Route('/api/pourcentage',name:'pourcentage',methods:'GET')]
+        public function pourcentage(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , DemandeFinancierRepository $de , PersonneMembreRepository $personneMembreRepository){
+            $personneMembre = $personneMembreRepository->getPersonne_LastCotisation(2);
+            $diff100 = $de->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
+            $diffpayer = $de->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
+            if( $diffpayer < 0){
+                $diffpayer =  1;
+            }
+            if($diff100 == 0){
+                $diff100 = 1;
+            }
+            $pourcentage = ($diffpayer * 100) / $diff100;
+            if($diff100 == $diffpayer){
+                $pourcentage = 0;
+            }
+            
+            return $this->json($pourcentage, 200, []);
+        }
+
+        public function pourcentageAA(
+            $id, 
+            PersonneMembreRepository $personneMembreRepository,
+            DemandeFinancierRepository $demandeFinancierRepository
+            ) {
+            $personneMembre = $personneMembreRepository->getPersonne_LastCotisation($id);
+            $mois_total = $demandeFinancierRepository->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
+            $mois_a_payer = $demandeFinancierRepository->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
+            if($personneMembre['date_inscription'] == $personneMembre['dernier_payement']) {
+                $mois_a_payer = 0;
+            }
+
+            return ($mois_a_payer * 100) / $mois_total;
+        }
     }
+
+    

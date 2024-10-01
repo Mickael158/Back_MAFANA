@@ -2,8 +2,10 @@
     namespace App\Controller;
 
 use App\Entity\DemandeMateriel;
+use App\Entity\DonnationMateriel;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\DemandeMaterielRepository;
+use App\Repository\DonnationMaterielRepository;
 use App\Repository\MaterielRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\UsersRepository;
@@ -50,5 +52,9 @@ use Symfony\Component\Routing\Attribute\Route;
                 ->setNombre($stockMateriel[0]['difference']);
             
             return $this->json($stockService, 200, []);
+        }
+        #[Route('/api/SelectAllDonnationMaterile',name:'SelectAllDonnationMaterile',methods:'GET')]
+        public function selectAll(DonnationMaterielRepository $demandeFinancierRepository){
+            return $this->json($demandeFinancierRepository->findAll(), 200, []);
         }
     }

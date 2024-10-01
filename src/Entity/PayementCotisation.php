@@ -60,12 +60,12 @@ class PayementCotisation
         return $this;
     }
 
-    public function getDate_payer(): ?\DateTimeInterface
+    public function getDatePayer(): ?\DateTimeInterface
     {
         return $this->Date_payer;
     }
 
-    public function setDate_payer(\DateTimeInterface $Date_payer): static
+    public function setDatePayer(\DateTimeInterface $Date_payer): static
     {
         $this->Date_payer = $Date_payer;
 

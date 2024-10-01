@@ -75,8 +75,7 @@ class AppFixtures extends Fixture
         $user
             ->setUsername('Administrateur')
             ->setPassword($this->hasher->hashPassword($user,'123456'))
-            ->setIdPersonne($personne)
-            ->setIdRole($idRole[0])
+            ->setIdPersonne($idPersonne[0])
             ->setRoles(['ROLE_'.$idRole[0]->getNomRole()])
             ;
         $manager->persist($user);

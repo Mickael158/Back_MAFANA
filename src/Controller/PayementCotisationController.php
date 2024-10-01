@@ -39,7 +39,7 @@ use Symfony\Component\Routing\Attribute\Route;
                         $Payement 
                             ->setDateDePayement(new \DateTime())
                             ->setMontantCotisationTotalPayer($montant)
-                            ->setDate_payer($date)
+                            ->setDatePayer($date)
                             ->setIdUtilisateur($user)
                             ->setIdPersonneMembre($personne);
                         $montants = $montants + $Payement->getMontantCotisationTotalPayer();

@@ -31,7 +31,8 @@ security:
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
         - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
-        - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
+        - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }
+        - { path: ^/api/Etat, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

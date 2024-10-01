@@ -35,7 +35,6 @@ class DemandeFinancierRepository extends ServiceEntityRepository
     
     public function pourcentage($id) {
         $personneMembre = $this->personneMembreRepository->getPersonne_LastCotisation($id);
-        
         $diff100 = $this->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
         $diffpayer = $this->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
         if( $diffpayer < 0){

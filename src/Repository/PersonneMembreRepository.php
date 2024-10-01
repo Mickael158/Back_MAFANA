@@ -78,6 +78,90 @@ class PersonneMembreRepository extends ServiceEntityRepository
         
         return $resultSet->fetchAllAssociative();
     }
+    public function getPersIndepNotUser()
+{
+    // Requête SQL
+    $sql = '
+        WITH personne_marier AS (
+            SELECT 
+                CASE 
+                    WHEN d_mari.id_personne_membre_id IS NULL THEN p_mari.id
+                    WHEN d_marie.id_personne_membre_id IS NULL THEN p_marie.id
+                    ELSE NULL
+                END AS id_personne_marier_vivant
+            FROM mariage m
+            LEFT JOIN personne_membre p_mari ON p_mari.id = m.id_mari_id
+            LEFT JOIN personne_membre p_marie ON p_marie.id = m.id_marie_id
+            LEFT JOIN decede d_mari ON p_mari.id = d_mari.id_personne_membre_id
+            LEFT JOIN decede d_marie ON p_marie.id = d_marie.id_personne_membre_id
+            WHERE d_mari.id_personne_membre_id IS NULL 
+            OR d_marie.id_personne_membre_id IS NULL
+        )
+
+        SELECT 
+            pm.*, 
+            MAX(p_c.date_payer) AS dernier_payement, 
+            \'Marier\' AS situation
+        FROM personne_membre pm
+        JOIN personne_marier p_m ON p_m.id_personne_marier_vivant = pm.id
+        LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = pm.id
+        LEFT JOIN users u ON u.id_personne_id = pm.id  
+        LEFT JOIN quitte q ON q.id_personne_membre_id = pm.id
+        WHERE u.id_personne_id IS NULL
+        AND q.id_personne_membre_id IS NULL  
+        GROUP BY pm.id
+
+        UNION
+
+        SELECT 
+            pm.*, 
+            MAX(p_c.date_payer) AS dernier_payement, 
+            \'Celibataire\' AS situation
+        FROM personne_membre pm
+        LEFT JOIN mariage mari ON pm.id = mari.id_mari_id OR pm.id = mari.id_marie_id
+        LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = pm.id
+        LEFT JOIN users u ON u.id_personne_id = pm.id  
+        LEFT JOIN quitte q ON q.id_personne_membre_id = pm.id
+        WHERE (mari.id_mari_id IS NULL OR pm.id = mari.id_marie_id)
+        AND EXTRACT(YEAR FROM AGE(pm.date_de_naissance)) >= 21  
+        AND u.id_personne_id IS NULL
+        AND q.id_personne_membre_id IS NULL  
+        GROUP BY pm.id;
+    ';
+
+    // Connexion à la base de données
+    $conn = $this->getEntityManager()->getConnection();
+    
+    // Préparation de la requête
+    $stmt = $conn->prepare($sql);
+    
+    // Exécution de la requête
+    $resultSet = $stmt->executeQuery();
+    
+    // Retourne les résultats sous forme de tableau associatif
+    return $resultSet->fetchAllAssociative();
+}
+
+    public function getPersNotQuitte()
+    {
+        $sql = '
+            select pm.* from personne_membre pm
+                LEFT join quitte q on q.id_personne_membre_id=pm.id
+            where q.id_personne_membre_id is NULL;
+        ';
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        // Préparation de la requête
+        $stmt = $conn->prepare($sql);
+        
+        // Exécution de la requête
+        $resultSet = $stmt->executeQuery();
+        
+        // Retourne les résultats sous forme de tableau associatif
+        return $resultSet->fetchAllAssociative();
+    }
+
 
     public function getPersonne_LastCotisation(int $id_personne)
     {

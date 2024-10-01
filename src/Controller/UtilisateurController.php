@@ -11,6 +11,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -28,15 +29,21 @@ class UtilisateurController extends AbstractController
             $Utilisateur = new Users();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $Role = $roleRepository->find($data_decode['idRole']);
+            $Role=$data_decode['Role'];
+            $ListeRole = [];
             $Personne = $personneMembreRepository->find($data_decode['idPersonne']);
             $Utilisateur
-                ->setIdRole($Role)
                 ->setIdPersonne($Personne)
                 ->setUsername($data_decode['username'])
-                ->setPassword($this->hasher->hashPassword($Utilisateur, $data_decode['Password']))
-                ->setRoles([$Role->getNomRole()])
-                ->setToken($this->hasher->hashPassword($Utilisateur, $data_decode['Password']));
+                ->setPassword($this->hasher->hashPassword($Utilisateur, $data_decode['Password']));
+            for($i=0;$i < count($Role);$i++){
+                $data = $roleRepository->find($Role[$i]);
+                $Utilisateur->setRoles(['ROLE_'.$data->getNomRole()]);
+                foreach ($Utilisateur->getRoles() as $value) {
+                    $ListeRole[] = $value;
+                }
+            };
+            $Utilisateur->setRoles($ListeRole);
             $em->persist($Utilisateur);
             $em->flush();
             return $this->json(['message' => 'Utilisateur inserer'], 200, []);
@@ -100,5 +107,11 @@ class UtilisateurController extends AbstractController
         } else {
             return new Response('Aucun utilisateur dans la session.', 404);
         }
+    }
+
+    #[Route('/api/AllUtilisateur',name:'all_user',methods:['GET'])]
+    public function SelectAllUser(UsersRepository $usersRepository):JsonResponse
+    {
+        return $this->json($usersRepository->findAll());
     }
 }

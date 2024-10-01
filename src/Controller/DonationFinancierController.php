@@ -2,8 +2,10 @@
     namespace App\Controller;
 
 use App\Entity\DonationFinancier;
+use App\Entity\DonnationMateriel;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\DonationFinancierRepository;
+use App\Repository\DonnationMaterielRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\UsersRepository;
 use App\Service\InvestigationFinancier;
@@ -56,5 +58,9 @@ use Symfony\Component\Routing\Attribute\Route;
                 $demande_final[] = $investigationFinancier;
             }
             return $this->json($demande_final, 200, []);
+        }
+        #[Route('/api/SelectAllDonnationFinancier',name:'SelectAllDonnationFinancier',methods:'GET')]
+        public function selectAll(DonationFinancierRepository $donationFinancierRepository){
+            return $this->json($donationFinancierRepository->findAll(), 200, []);
         }
     }

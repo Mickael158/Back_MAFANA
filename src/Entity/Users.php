@@ -31,16 +31,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Role $Id_Role = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?PersonneMembre $Id_Personne = null;
 
-    #[ORM\Column(length: 255,nullable: true)]
-    private ?string $Token = null;
 
     public function getId(): ?int
     {
@@ -117,18 +112,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getIdRole(): ?role
-    {
-        return $this->Id_Role;
-    }
-
-    public function setIdRole(?role $Id_Role): static
-    {
-        $this->Id_Role = $Id_Role;
-
-        return $this;
-    }
-
     public function getIdPersonne(): ?PersonneMembre
     {
         return $this->Id_Personne;
@@ -141,15 +124,5 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getToken(): ?string
-    {
-        return $this->Token;
-    }
-
-    public function setToken(string $Token): static
-    {
-        $this->Token = $Token;
-
-        return $this;
-    }
+    
 }

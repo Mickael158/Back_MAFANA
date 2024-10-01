@@ -117,7 +117,17 @@ class PayementCotisationRepository extends ServiceEntityRepository
     
     return $resultSet->fetchAllAssociative();
 }
-
+public function getAllRecue()
+{
+    $sql = "";
+    
+    $conn = $this->getEntityManager()->getConnection();
+    
+    $stmt = $conn->prepare($sql);
+    $resultSet = $stmt->executeQuery();
+    
+    return $resultSet->fetchAllAssociative();
+}
     
     
     //    /**
