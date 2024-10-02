@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\Suivis;
 use App\Entity\Users;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\RoleRepository;
@@ -88,11 +89,27 @@ class UtilisateurController extends AbstractController
     }
 
     #[Route('/api/AttributionRole/{id}',name:'attribution_role',methods:['POST'])]
-    public function AttributionRole(Users $users,EntityManagerInterface $em,Request $request,RoleRepository $roleRepository):JsonResponse
+    public function AttributionRole(Users $users,EntityManagerInterface $em,Request $request,RoleRepository $roleRepository,JWTEncoderInterface $jWTEncoderInterface,UsersRepository $usersRepository):JsonResponse
     {
         $data = $request->getContent();
         $data_decode = json_decode($data, true);
         $role = $data_decode['roles'];
+        $chaine = '';
+        foreach ($role as $value) {
+            $result = $roleRepository->find($value);
+            $chaine = $chaine . ' ' . $result->getNomRole();
+        }
+        $token = $data_decode['token'];
+        $decode = $jWTEncoderInterface->decode($token);
+        $Administrateur = $usersRepository->findOneBy(['username'=>$decode['username']]);
+        $suivis = new Suivis();
+        $suivis
+            ->setAdministrateurId($Administrateur)
+            ->setDateAttribution(new \DateTime())
+            ->setRole($chaine)
+            ->setUtilisateurId($users);
+        $em->persist($suivis);
+        $em->flush($suivis);
         $ListeRole = [];
             for($i=0;$i < count($role);$i++){
                 $data = $roleRepository->find($role[$i]);
@@ -101,9 +118,8 @@ class UtilisateurController extends AbstractController
                     $ListeRole[] = $value;
                 }
             };
-            $users->setRoles($ListeRole);
-            $em->flush();
-            return $this->json(['message' => 'Utilisateur inserer'], 200, []);
-        return $this->json($usersRepository->findAll());
+        $users->setRoles($ListeRole);
+        $em->flush();
+        return $this->json(['message' => 'Utilisateur inserer'], 200, []);
     }
 }
