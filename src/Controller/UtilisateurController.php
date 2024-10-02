@@ -48,29 +48,7 @@ class UtilisateurController extends AbstractController
             $em->flush();
             return $this->json(['message' => 'Utilisateur inserer'], 200, []);
         }
-    // #[Route('/api/login', name: 'login', methods: ['POST'])]
-    // public function Authentification(UsersRepository $UserRepository, Request $Request, PersonneMembreRepository $PersonneMembreRepository , JWTTokenManagerInterface $jWTTokenManagerInterface,UserPasswordHasherInterface $hasher)
-    // {
-    //     $data = $Request->getContent();
-    //     $data_decode = json_decode($data, true);
-    //     $username = $data_decode['username'];
-    //     $password = $data_decode['password'];
-    //     $Utilisateur = $UserRepository->findOneBy(['username' => $username]);
-    //     if ($Utilisateur) {
-    //         if($hasher->isPasswordValid($Utilisateur, $password)){
-    //             $userInterfacem = new UtilisateurCustom();
-    //             $userInterfacem->setUsername($Utilisateur->getUsername());
-    //             $userInterfacem->setPassword($Utilisateur->getPassword());
-    //             $userInterfacem->setRoles($Utilisateur->getRoles());
-    //             $token = $jWTTokenManagerInterface->create($Utilisateur);
-    //             return $this->json($token, 200, []);
-    //         }else{
-    //             return $this->json(['message' => 'Votre mot de passe est incorrect.'], 403, []);
-    //         }
-    //     } else {
-    //         return $this->json(['message' => 'Username incorrect.'], 403, []);
-    //     }
-    // }
+
     #[Route('/api/login', name: 'login', methods: ['POST'])]
     public function Authentification()
     {
@@ -94,15 +72,9 @@ class UtilisateurController extends AbstractController
     #[Route('/api/session-user', name: 'session_user', methods: ['GET'])]
     public function printSessionUser(SessionInterface $SESSION): Response
     {
-        // Récupérer l'utilisateur stocké dans la session
         $user = $SESSION->get('user');
-
-        // Vérifier si l'utilisateur est présent dans la session
         if ($user) {
-            // Convertir l'utilisateur en JSON pour l'affichage
             $userJson = json_encode($user);
-
-            // Retourner la réponse JSON
             return new Response($userJson, 200, ['Content-Type' => 'application/json']);
         } else {
             return new Response('Aucun utilisateur dans la session.', 404);
@@ -112,6 +84,26 @@ class UtilisateurController extends AbstractController
     #[Route('/api/AllUtilisateur',name:'all_user',methods:['GET'])]
     public function SelectAllUser(UsersRepository $usersRepository):JsonResponse
     {
+        return $this->json($usersRepository->findAll());
+    }
+
+    #[Route('/api/AttributionRole/{id}',name:'attribution_role',methods:['POST'])]
+    public function AttributionRole(Users $users,EntityManagerInterface $em,Request $request,RoleRepository $roleRepository):JsonResponse
+    {
+        $data = $request->getContent();
+        $data_decode = json_decode($data, true);
+        $role = $data_decode['roles'];
+        $ListeRole = [];
+            for($i=0;$i < count($role);$i++){
+                $data = $roleRepository->find($role[$i]);
+                $users->setRoles(['ROLE_'.$data->getNomRole()]);
+                foreach ($users->getRoles() as $value) {
+                    $ListeRole[] = $value;
+                }
+            };
+            $users->setRoles($ListeRole);
+            $em->flush();
+            return $this->json(['message' => 'Utilisateur inserer'], 200, []);
         return $this->json($usersRepository->findAll());
     }
 }

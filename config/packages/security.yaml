@@ -29,10 +29,9 @@ security:
             provider: app_user_provider
 
     access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
-        - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
+        - { path: ^/api/login, roles: PUBLIC_ACCESS }  
+        - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  
         - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }
-        - { path: ^/api/Etat, roles: PUBLIC_ACCESS }  # Permet l'accès anonyme
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
@@ -40,6 +39,6 @@ when@test:
         password_hashers:
             Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
                 algorithm: auto
-                cost: 4  # Valeur la plus basse pour bcrypt
-                time_cost: 3  # Valeur la plus basse pour securityargon
-                memory_cost: 10  # Valeur la plus basse pour argon
+                cost: 4  
+                time_cost: 3 
+                memory_cost: 10 
