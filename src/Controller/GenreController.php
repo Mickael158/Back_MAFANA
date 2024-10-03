@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-    #[IsGranted('ROLE_ADMIN')]
     class GenreController extends AbstractController{
 
         #[Route('/api/Genre',name:'selectAll_Genre',methods:'GET')]

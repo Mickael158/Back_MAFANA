@@ -10,11 +10,12 @@ use App\Repository\ProfessionRepository;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MEMBRE")'))]
     class QuitteController extends AbstractController{
         #[Route('/api/Quitte',name:'insetion_Quitte',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em , PersonneMembreRepository $personneMembreRepository ){
@@ -29,7 +30,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Personne Membre Profession inserer'], 200, []);
         }
         #[Route('/api/Quitte/{id}',name:'selectAll_Association',methods:'GET')]
-        public function selectAll(int $id , QuitteRepository $QuitteRepository){
+        public function selectAll(int $id ,QuitteRepository $QuitteRepository){
             return $this->json($QuitteRepository->getProfession_By_personne($id), 200, []);
         }
     }

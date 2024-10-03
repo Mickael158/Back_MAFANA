@@ -13,9 +13,12 @@ use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_PAYEMENT")'))]
     class DonnationMaterielController extends AbstractController{
 
         #[Route('/api/DonnationMateriel',name:'insetion_DonnationMateriel',methods:'POST')]
@@ -54,5 +57,9 @@ use Symfony\Component\Routing\Attribute\Route;
                 $demande_final[] = $investigationMateriel;
             }
             return $this->json($demande_final, 200, []);
+        }
+        #[Route('/api/SelectAllDonnationMaterile',name:'SelectAllDonnationMaterile',methods:'GET')]
+        public function selectAll(DonnationMaterielRepository $demandeFinancierRepository){
+            return $this->json($demandeFinancierRepository->findAll(), 200, []);
         }
     }

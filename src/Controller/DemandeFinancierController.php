@@ -8,9 +8,12 @@ use App\Repository\UsersRepository;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_DEMANDE")'))]
     class DemandeFinancierController extends AbstractController{
 
         #[Route('/api/DemandeFinancier',name:'insetion_DemandeFinancier',methods:'POST')]

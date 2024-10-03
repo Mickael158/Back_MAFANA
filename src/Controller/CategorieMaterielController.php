@@ -5,11 +5,12 @@ use App\Entity\CategorieMateriel;
 use App\Repository\CategorieMaterielRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_CRUD")'))]
     class CategorieMaterielController extends AbstractController{
 
         #[Route('/api/Categorie',name:'insetion_Categorie',methods:'POST')]

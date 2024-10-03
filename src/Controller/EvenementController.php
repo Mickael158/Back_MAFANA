@@ -10,12 +10,13 @@ use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ROLE_ADMIN')]
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_EVENEMENT")'))]
 class EvenementController extends AbstractController
 {
     #[Route('api/evenement',name:'insertion_evenement',methods:'POST')]

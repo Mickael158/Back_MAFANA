@@ -9,11 +9,12 @@ use App\Repository\PersonneMembreRepository;
 use App\Repository\ProfessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MEMBRE")'))]
     class PersonneMembreProfessionController extends AbstractController{
         #[Route('/api/PersonneMembreProfession',name:'insetion_PersonneMembreProfession',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em , PersonneMembreRepository $personneMembreRepository , ProfessionRepository $professionRepository){

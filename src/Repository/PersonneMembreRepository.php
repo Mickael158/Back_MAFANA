@@ -30,21 +30,18 @@ class PersonneMembreRepository extends ServiceEntityRepository
     public function getDonnee(string $file): ?array
     {
         try {
-            // Création du lecteur CSV
             $csv = Reader::createFromPath($file, 'r');
-            $csv->setHeaderOffset(0); // Si tu veux ignorer la première ligne comme dans ton code original
+            $csv->setHeaderOffset(0); 
 
-            // Lecture des enregistrements CSV sous forme de tableau associatif
             $records = $csv->getRecords();
 
             $valiny = [];
             foreach ($records as $record) {
-                $valiny[] = $record; // Chaque ligne est un tableau associatif avec en-têtes comme clés
+                $valiny[] = $record; 
             }
 
             return $valiny;
         } catch (Exception $e) {
-            // Gestion d'erreurs
             echo $e->getMessage();
             return null;
         }
@@ -54,25 +51,20 @@ class PersonneMembreRepository extends ServiceEntityRepository
         $resultatImports = [];
 
         try {
-            // Lecture du fichier CSV
             $csv = Reader::createFromPath($file, 'r');
-            $csv->setHeaderOffset(0); // On ignore les en-têtes
+            $csv->setHeaderOffset(0); 
 
             $records = $csv->getRecords();
 
             foreach ($records as $record) {
-                // Création d'une nouvelle instance de ResultatImport pour chaque ligne
                 $resultatImport = new PersonneMembre();
                 
-                // Mapping des données du CSV aux champs de l'entité
                 $resultatImport->setNomMembre( $record['etape']);
                 $resultatImport->setPrenomMembre($record['longueur']);
 
-                // Ajout du résultat importé à la liste
                 $resultatImports[] = $resultatImport;
             }
         } catch (Exception $e) {
-            // Gestion d'erreurs
             echo $e->getMessage();
         }
 
