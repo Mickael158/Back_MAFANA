@@ -26,7 +26,6 @@ class UtilisateurController extends AbstractController
     {
         
     }
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/Utilisateur',name:'insetion_Utilisateur',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em,RoleRepository $roleRepository , PersonneMembreRepository $personneMembreRepository){
             $Utilisateur = new Users();
@@ -60,13 +59,12 @@ class UtilisateurController extends AbstractController
 
     #[Route('/api/decode', name: 'decode', methods: ['POST'])]
     public function decodeToken(JWTEncoderInterface $jWTEncoderInterface,Request $request)
-    {
+    {   
         $data= $request->getContent();
         $data_decode = json_decode($data, true);
-
         try {
             $decodedData = $jWTEncoderInterface->decode($data_decode['token']);
-            return $this->json($decodedData['username'],200,[]);
+            return $this->json($decodedData['roles'],200,[]);
         } catch (\Exception $e) {
             return null;
         }
@@ -85,14 +83,12 @@ class UtilisateurController extends AbstractController
         }
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/AllUtilisateur',name:'all_user',methods:['GET'])]
     public function SelectAllUser(UsersRepository $usersRepository):JsonResponse
     {
         return $this->json($usersRepository->findAll());
     }
 
-    #[IsGranted('ROLE_ADMIN')]
     #[Route('/api/AttributionRole/{id}',name:'attribution_role',methods:['POST'])]
     public function AttributionRole(Users $users,EntityManagerInterface $em,Request $request,RoleRepository $roleRepository,JWTEncoderInterface $jWTEncoderInterface,UsersRepository $usersRepository):JsonResponse
     {

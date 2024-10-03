@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_ASSOCIATION")'))]
+   
     class AssociationController extends AbstractController{
         
         #[Route('/api/Association/{id}',name:'modification_Association',methods:'POST')]

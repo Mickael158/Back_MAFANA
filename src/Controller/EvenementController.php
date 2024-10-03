@@ -16,7 +16,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_EVENEMENT")'))]
 class EvenementController extends AbstractController
 {
     #[Route('api/evenement',name:'insertion_evenement',methods:'POST')]

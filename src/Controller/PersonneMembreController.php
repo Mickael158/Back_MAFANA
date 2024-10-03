@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MEMBRE")'))]
+    #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_MEMBRE") or is_granted("ROLE_PAYEMENT")'))]
     class PersonneMembreController extends AbstractController{
 
         #[Route('/api/Personne',name:'insetion_Personne',methods:'POST')]
