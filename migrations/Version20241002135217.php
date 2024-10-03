@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241002074435 extends AbstractMigration
+final class Version20241002135217 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -44,6 +44,7 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE refuser_demande_materiel_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE role_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE sortie_caisse_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE SEQUENCE suivis_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE tresoreri_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE type_depense_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE type_evenement_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
@@ -108,6 +109,9 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('CREATE TABLE sortie_caisse (id INT NOT NULL, id_utilisateur_id INT NOT NULL, id_type_depence_id INT NOT NULL, date_sortie_caisse DATE NOT NULL, montant DOUBLE PRECISION NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE INDEX IDX_B5579974C6EE5C49 ON sortie_caisse (id_utilisateur_id)');
         $this->addSql('CREATE INDEX IDX_B5579974D565974C ON sortie_caisse (id_type_depence_id)');
+        $this->addSql('CREATE TABLE suivis (id INT NOT NULL, administrateur_id_id INT NOT NULL, utilisateur_id_id INT NOT NULL, date_attribution DATE NOT NULL, role VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX IDX_6627ED706B298048 ON suivis (administrateur_id_id)');
+        $this->addSql('CREATE INDEX IDX_6627ED70B981C689 ON suivis (utilisateur_id_id)');
         $this->addSql('CREATE TABLE tresoreri (id INT NOT NULL, montant DOUBLE PRECISION NOT NULL, date_tresoreri TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE type_depense (id INT NOT NULL, motif_depense VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE type_evenement (id INT NOT NULL, nom_type_evenement VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
@@ -157,6 +161,8 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('ALTER TABLE refuser_demande_materiel ADD CONSTRAINT FK_1321B6B3C6EE5C49 FOREIGN KEY (id_utilisateur_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE sortie_caisse ADD CONSTRAINT FK_B5579974C6EE5C49 FOREIGN KEY (id_utilisateur_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE sortie_caisse ADD CONSTRAINT FK_B5579974D565974C FOREIGN KEY (id_type_depence_id) REFERENCES type_depense (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE suivis ADD CONSTRAINT FK_6627ED706B298048 FOREIGN KEY (administrateur_id_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
+        $this->addSql('ALTER TABLE suivis ADD CONSTRAINT FK_6627ED70B981C689 FOREIGN KEY (utilisateur_id_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE users ADD CONSTRAINT FK_1483A5E9BA091CE5 FOREIGN KEY (id_personne_id) REFERENCES personne_membre (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE validation_demande_financier ADD CONSTRAINT FK_C2692248110C53AB FOREIGN KEY (id_demande_financier_id) REFERENCES demande_financier (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
         $this->addSql('ALTER TABLE validation_demande_financier ADD CONSTRAINT FK_C2692248C6EE5C49 FOREIGN KEY (id_utilisateur_id) REFERENCES users (id) NOT DEFERRABLE INITIALLY IMMEDIATE');
@@ -195,6 +201,7 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('DROP SEQUENCE refuser_demande_materiel_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE role_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE sortie_caisse_id_seq CASCADE');
+        $this->addSql('DROP SEQUENCE suivis_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE tresoreri_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE type_depense_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE type_evenement_id_seq CASCADE');
@@ -235,6 +242,8 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('ALTER TABLE refuser_demande_materiel DROP CONSTRAINT FK_1321B6B3C6EE5C49');
         $this->addSql('ALTER TABLE sortie_caisse DROP CONSTRAINT FK_B5579974C6EE5C49');
         $this->addSql('ALTER TABLE sortie_caisse DROP CONSTRAINT FK_B5579974D565974C');
+        $this->addSql('ALTER TABLE suivis DROP CONSTRAINT FK_6627ED706B298048');
+        $this->addSql('ALTER TABLE suivis DROP CONSTRAINT FK_6627ED70B981C689');
         $this->addSql('ALTER TABLE users DROP CONSTRAINT FK_1483A5E9BA091CE5');
         $this->addSql('ALTER TABLE validation_demande_financier DROP CONSTRAINT FK_C2692248110C53AB');
         $this->addSql('ALTER TABLE validation_demande_financier DROP CONSTRAINT FK_C2692248C6EE5C49');
@@ -267,6 +276,7 @@ final class Version20241002074435 extends AbstractMigration
         $this->addSql('DROP TABLE refuser_demande_materiel');
         $this->addSql('DROP TABLE role');
         $this->addSql('DROP TABLE sortie_caisse');
+        $this->addSql('DROP TABLE suivis');
         $this->addSql('DROP TABLE tresoreri');
         $this->addSql('DROP TABLE type_depense');
         $this->addSql('DROP TABLE type_evenement');

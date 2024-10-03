@@ -4,8 +4,11 @@ namespace App\Repository;
 
 use App\Entity\Genre;
 use App\Entity\PersonneMembre;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Exception;
+use League\Csv\Reader;
 
 /**
  * @extends ServiceEntityRepository<PersonneMembre>
@@ -23,6 +26,57 @@ class PersonneMembreRepository extends ServiceEntityRepository
             ->setParameter('Genre',$genre)
             ->getQuery()
             ->getResult();
+    }
+    public function getDonnee(string $file): ?array
+    {
+        try {
+            // Création du lecteur CSV
+            $csv = Reader::createFromPath($file, 'r');
+            $csv->setHeaderOffset(0); // Si tu veux ignorer la première ligne comme dans ton code original
+
+            // Lecture des enregistrements CSV sous forme de tableau associatif
+            $records = $csv->getRecords();
+
+            $valiny = [];
+            foreach ($records as $record) {
+                $valiny[] = $record; // Chaque ligne est un tableau associatif avec en-têtes comme clés
+            }
+
+            return $valiny;
+        } catch (Exception $e) {
+            // Gestion d'erreurs
+            echo $e->getMessage();
+            return null;
+        }
+    }
+    public function findAllFromFile(string $file): array
+    {
+        $resultatImports = [];
+
+        try {
+            // Lecture du fichier CSV
+            $csv = Reader::createFromPath($file, 'r');
+            $csv->setHeaderOffset(0); // On ignore les en-têtes
+
+            $records = $csv->getRecords();
+
+            foreach ($records as $record) {
+                // Création d'une nouvelle instance de ResultatImport pour chaque ligne
+                $resultatImport = new PersonneMembre();
+                
+                // Mapping des données du CSV aux champs de l'entité
+                $resultatImport->setNomMembre( $record['etape']);
+                $resultatImport->setPrenomMembre($record['longueur']);
+
+                // Ajout du résultat importé à la liste
+                $resultatImports[] = $resultatImport;
+            }
+        } catch (Exception $e) {
+            // Gestion d'erreurs
+            echo $e->getMessage();
+        }
+
+        return $resultatImports;
     }
 
     public function findPersonnesNonMariees()

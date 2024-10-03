@@ -11,6 +11,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 
     class AssociationController extends AbstractController{
+        
         #[Route('/api/Association/{id}',name:'modification_Association',methods:'POST')]
         public function modifier(Association $Association,Request $request, EntityManagerInterface $em){
             $data = $request->getContent();

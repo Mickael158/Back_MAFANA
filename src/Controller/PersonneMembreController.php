@@ -99,14 +99,13 @@ use Symfony\Component\Routing\Attribute\Route;
         {
             return $this->json($personneMembreRepository->getPersNotQuitte() , 200, []);
         }
-        #[Route('/api/Etats',name:'insetion_DemandeFinacier',methods:'GET')]
+        #[Route('/api/Etat',name:'insetion_DemandeFinacier',methods:'GET')]
         public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
             $personneAll = $personneMembreRepository->findAll();
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
                 $pourcentage = $this->pourcentageAA(2, $personneMembreRepository, $demandeFinancierRepository);
-                dd($pourcentage);
                 $personne = $personneMembreRepository->find($personneAll[$i]->getId());
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
@@ -143,6 +142,9 @@ use Symfony\Component\Routing\Attribute\Route;
             $mois_a_payer = $demandeFinancierRepository->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
             if($personneMembre['date_inscription'] == $personneMembre['dernier_payement']) {
                 $mois_a_payer = 0;
+            }
+            if($mois_total == 0){
+                return 0;
             }
 
             return ($mois_a_payer * 100) / $mois_total;

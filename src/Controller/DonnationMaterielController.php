@@ -23,6 +23,7 @@ use Symfony\Component\Routing\Attribute\Route;
             $DonnationMateriel = new DonnationMateriel();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
+            dd($data_decode['id_materiel_id']);
             $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
             $user = $usersRepository->findOneBy(['username'=>$decode['username']]);
             $materiel = $materielrepository->find($data_decode['id_materiel_id']);
