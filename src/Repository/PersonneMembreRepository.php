@@ -27,49 +27,7 @@ class PersonneMembreRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
-    public function getDonnee(string $file): ?array
-    {
-        try {
-            $csv = Reader::createFromPath($file, 'r');
-            $csv->setHeaderOffset(0); 
-
-            $records = $csv->getRecords();
-
-            $valiny = [];
-            foreach ($records as $record) {
-                $valiny[] = $record; 
-            }
-
-            return $valiny;
-        } catch (Exception $e) {
-            echo $e->getMessage();
-            return null;
-        }
-    }
-    public function findAllFromFile(string $file): array
-    {
-        $resultatImports = [];
-
-        try {
-            $csv = Reader::createFromPath($file, 'r');
-            $csv->setHeaderOffset(0); 
-
-            $records = $csv->getRecords();
-
-            foreach ($records as $record) {
-                $resultatImport = new PersonneMembre();
-                
-                $resultatImport->setNomMembre( $record['etape']);
-                $resultatImport->setPrenomMembre($record['longueur']);
-
-                $resultatImports[] = $resultatImport;
-            }
-        } catch (Exception $e) {
-            echo $e->getMessage();
-        }
-
-        return $resultatImports;
-    }
+    
 
     public function findPersonnesNonMariees()
     {

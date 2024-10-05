@@ -15,7 +15,18 @@ class GenreRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Genre::class);
     }
+    public function getGenre_by_non(String $nom_genre)
+    {
+        $sql = 'select * from genre where nom_genre=:nom_genre';
 
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('nom_genre', $nom_genre);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
     //    /**
     //     * @return Genre[] Returns an array of Genre objects
     //     */

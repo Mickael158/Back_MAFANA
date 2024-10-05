@@ -32,6 +32,7 @@ security:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }  
         - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  
         - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }
+        - { path: ^/api/import, roles: PUBLIC_ACCESS }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:

@@ -15,6 +15,18 @@ class ValleeRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Vallee::class);
     }
+    public function getValle_by_nomValle(String $nom_valle)
+    {
+        $sql = 'select * from vallee where nom_vallee=:nom_valle';
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('nom_valle', $nom_valle);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
 
     //    /**
     //     * @return Vallee[] Returns an array of Vallee objects
