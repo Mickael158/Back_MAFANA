@@ -106,13 +106,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
             $personneAll = $personneMembreRepository->findAll();
             $personnefin = [];
+            $demande_initial = $demandeFinancierRepository->getDemanceFinancier_With_Investi();
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $this->pourcentageAA(2, $personneMembreRepository, $demandeFinancierRepository);
+                $pourcentage = $demandeFinancierRepository->pourcentage($personneAll[$i]->getId());
                 $personne = $personneMembreRepository->find($personneAll[$i]->getId());
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
-                $personnefin[] = $investigationFinancier;
+                $personnefin[] = $investigationFinancier; 
             }
             return $this->json($personnefin, 200, []);
         }
