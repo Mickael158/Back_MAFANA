@@ -71,9 +71,10 @@ class PersonneMembreRepository extends ServiceEntityRepository
         FROM personne_membre p_m
             LEFT JOIN mariage mari ON p_m.id = mari.id_mari_id OR p_m.id = mari.id_marie_id
             LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = p_m.id
-        WHERE (mari.id_mari_id IS NULL OR p_m.id = mari.id_marie_id)
+        WHERE mari.id_mari_id IS NULL 
+        OR  mari.id_marie_id IS NULL
         AND EXTRACT(YEAR FROM AGE(date_de_naissance)) >= 21
-        GROUP BY p_m.id';
+        GROUP BY p_m.id;';
 
         $conn = $this->getEntityManager()->getConnection();
         
@@ -216,8 +217,8 @@ class PersonneMembreRepository extends ServiceEntityRepository
                 FROM  enfant e
                     JOIN  mariage m ON e.id_mariage_parent_id = m.id
                     JOIN  personne_membre p ON e.id_enfant_id = p.id
-                WHERE  m.id_mari_id = :id_personne OR m.id_marie_id = :id_personne
-                AND EXTRACT(YEAR FROM AGE(p.date_de_naissance)) <= 21;';
+                WHERE EXTRACT(YEAR FROM AGE(p.date_de_naissance)) <21
+                AND m.id_mari_id = :id_personne OR m.id_marie_id = :id_personne;';
         $conn = $this->getEntityManager()->getConnection();
         
         $stmt = $conn->prepare($sql);

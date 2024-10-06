@@ -36,7 +36,9 @@ class EvenementController extends AbstractController
             ->setDateEvenement(new DateTime($data_decode['date_debut']))
             ->setDatePublication(new DateTime())
             ->setDateFinEvenement(new DateTime($data_decode['date_fin']))
-            ->setLieuEvenement($data_decode['lieu']);
+            ->setLieuEvenement($data_decode['lieu'])
+            ->setNom($data_decode['nom'])
+            ->setPublier($data_decode['publier']);
         $em->persist($evenement);
         $em->flush();
         return $this->json(['message' => 'success de linsertion'],200,[]);
@@ -46,6 +48,12 @@ class EvenementController extends AbstractController
         public function supprimer(Evenement $Evenement,Request $request, EntityManagerInterface $em){
             $em->remove($Evenement);
             $em->flush();
+            return $this->json(['message' => 'Evenement Supprimer'], 200, []);
+        }
+
+        #[Route('/api/Evenement/affichable/{id}/{bool}',name:'modification_affichage_Evenement',methods:'POST')]
+        public function affichable($id , $bool , EvenementRepository $Evenement ){
+            $Evenement->affichable($id , $bool);
             return $this->json(['message' => 'Evenement Supprimer'], 200, []);
         }
 

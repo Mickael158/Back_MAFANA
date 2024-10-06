@@ -41,6 +41,12 @@ class Evenement
     #[ORM\JoinColumn(nullable: false)]
     private ?Association $Id_Association = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $Nom = null;
+
+    #[ORM\Column]
+    private ?bool $publier = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -138,6 +144,30 @@ class Evenement
     public function setIdAssociation(?Association $Id_Association): static
     {
         $this->Id_Association = $Id_Association;
+
+        return $this;
+    }
+
+    public function getNom(): ?string
+    {
+        return $this->Nom;
+    }
+
+    public function setNom(string $Nom): static
+    {
+        $this->Nom = $Nom;
+
+        return $this;
+    }
+
+    public function isPublier(): ?bool
+    {
+        return $this->publier;
+    }
+
+    public function setPublier(bool $publier): static
+    {
+        $this->publier = $publier;
 
         return $this;
     }
