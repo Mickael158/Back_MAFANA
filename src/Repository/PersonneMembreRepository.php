@@ -42,39 +42,51 @@ class PersonneMembreRepository extends ServiceEntityRepository
     public function getPersIndep()
     {
         $sql = 'WITH personne_marier AS (
-            SELECT 
-                CASE 
-                    WHEN d_mari.id_personne_membre_id IS NULL THEN p_mari.id
-                    WHEN d_marie.id_personne_membre_id IS NULL THEN p_marie.id
-                    ELSE NULL
-                END AS id_personne_marier_vivant
-            FROM mariage m 
+                SELECT 
+                    CASE 
+                        WHEN d_mari.id_personne_membre_id IS NULL THEN p_mari.id
+                        WHEN d_marie.id_personne_membre_id IS NULL THEN p_marie.id
+                        ELSE NULL
+                    END AS id_personne_marier_vivant
+                FROM mariage m 
                 LEFT JOIN personne_membre p_mari ON p_mari.id = m.id_mari_id
                 LEFT JOIN personne_membre p_marie ON p_marie.id = m.id_marie_id
                 LEFT JOIN decede d_mari ON p_mari.id = d_mari.id_personne_membre_id
                 LEFT JOIN decede d_marie ON p_marie.id = d_marie.id_personne_membre_id
-            WHERE d_mari.id_personne_membre_id IS NULL OR d_marie.id_personne_membre_id IS NULL
-        )
-        SELECT
-            personne_membre.*,
-            MAX(p_c.date_payer) AS dernier_payement,
-            \'Marier\' AS situation
-        FROM personne_membre 
+                WHERE d_mari.id_personne_membre_id IS NULL OR d_marie.id_personne_membre_id IS NULL
+            ),
+            personne_celibataire AS (
+                SELECT 
+                    p_m.*,
+                    MAX(p_c.date_payer) AS dernier_payement,
+                    \'Celibataire\' AS situation
+                FROM personne_membre p_m
+                LEFT JOIN mariage mari ON p_m.id = mari.id_mari_id OR p_m.id = mari.id_marie_id
+                LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = p_m.id
+                LEFT JOIN quitte q ON p_m.id = q.id_personne_membre_id
+                WHERE q.id_personne_membre_id IS NULL 
+                AND EXTRACT(YEAR FROM AGE(date_de_naissance)) >= 21
+                AND (mari.id_mari_id IS NULL AND mari.id_marie_id IS NULL)
+                GROUP BY p_m.id
+            )
+            SELECT 
+                personne_membre.*,
+                MAX(p_c.date_payer) AS dernier_payement,
+                \'Marier\' AS situation
+            FROM personne_membre 
             JOIN personne_marier p_m ON p_m.id_personne_marier_vivant = personne_membre.id
             LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = personne_membre.id
-        GROUP BY personne_membre.id
-        UNION
-        SELECT 
-            p_m.*,
-            MAX(p_c.date_payer) AS dernier_payement,
-            \'Celibataire\' AS situation
-        FROM personne_membre p_m
-            LEFT JOIN mariage mari ON p_m.id = mari.id_mari_id OR p_m.id = mari.id_marie_id
-            LEFT JOIN payement_cotisation p_c ON p_c.id_personne_membre_id = p_m.id
-        WHERE mari.id_mari_id IS NULL 
-        OR  mari.id_marie_id IS NULL
-        AND EXTRACT(YEAR FROM AGE(date_de_naissance)) >= 21
-        GROUP BY p_m.id;';
+            LEFT JOIN quitte q ON personne_membre.id = q.id_personne_membre_id
+            WHERE q.id_personne_membre_id IS NULL
+            GROUP BY personne_membre.id
+
+            UNION
+
+            SELECT 
+                personne_celibataire.*
+            FROM personne_celibataire
+            LEFT JOIN decede d ON personne_celibataire.id = d.id_personne_membre_id
+            WHERE d.id_personne_membre_id IS NULL;';
 
         $conn = $this->getEntityManager()->getConnection();
         
@@ -165,6 +177,24 @@ class PersonneMembreRepository extends ServiceEntityRepository
         
         // Retourne les résultats sous forme de tableau associatif
         return $resultSet->fetchAllAssociative();
+    }
+    public function getAnneInscription($id)
+    {
+        $sql = '
+            SELECT EXTRACT(YEAR FROM date_inscription) AS annee_de_naissance
+                    FROM personne_membre
+                where id='.$id;
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        // Préparation de la requête
+        $stmt = $conn->prepare($sql);
+        
+        // Exécution de la requête
+        $resultSet = $stmt->executeQuery();
+        
+        // Retourne les résultats sous forme de tableau associatif
+        return $resultSet->fetchAssociative();
     }
 
 

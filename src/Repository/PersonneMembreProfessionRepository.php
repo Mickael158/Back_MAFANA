@@ -15,7 +15,7 @@ class PersonneMembreProfessionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, PersonneMembreProfession::class);
     }
-    public function getProfession_By_personne(int $id_personne)
+    public function getProfessionNot_By_personne(int $id_personne)
     {
         $sql = ' select 
                 * 

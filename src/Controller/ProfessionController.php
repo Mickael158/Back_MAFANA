@@ -44,6 +44,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectAll(ProfessionRepository $ProfessionRepository){
             return $this->json($ProfessionRepository->findAll(), 200, []);
         }
+        #[Route('/api/getProfession_By_personne/{id}',name:'getProfession_By_personne',methods:'GET')]
+        public function getProfession_By_personne($id , ProfessionRepository $ProfessionRepository){
+            return $this->json($ProfessionRepository->getProfession_By_personne($id), 200, []);
+        }
 
         #[Route('/api/Profession/{id}',name:'selectId_Profession',methods:'GET')]
         public function selectById($id,ProfessionRepository $ProfessionRepository){

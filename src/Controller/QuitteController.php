@@ -19,18 +19,21 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
     class QuitteController extends AbstractController{
         #[Route('/api/Quitte',name:'insetion_Quitte',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em , PersonneMembreRepository $personneMembreRepository ){
-            $Quitte = new Quitte();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $personne = $personneMembreRepository->find($data_decode['IdPersonneMembre']);
-            $Quitte->setIdPersonneMembre($personne);
-            $Quitte->setDate(new \DateTime($data_decode['date']));
-            $em->persist($Quitte);
-            $em->flush();
+            $famille = $data_decode['famille'];
+            for($i = 0 ; $i < count($famille) ; $i++) {
+                $Quitte = new Quitte();
+                $personne = $personneMembreRepository->find($famille[$i]['id']);
+                $Quitte->setIdPersonneMembre($personne);
+                $Quitte->setDate(new \DateTime());
+                $em->persist($Quitte);
+                $em->flush();
+            }
             return $this->json(['message' => 'Personne Membre Profession inserer'], 200, []);
         }
-        #[Route('/api/Quitte/{id}',name:'selectAll_Association',methods:'GET')]
-        public function selectAll(int $id ,QuitteRepository $QuitteRepository){
-            return $this->json($QuitteRepository->getProfession_By_personne($id), 200, []);
-        }
+        // #[Route('/api/Quitte/{id}',name:'selectAll_Association',methods:'GET')]
+        // public function selectAll(int $id ,QuitteRepository $QuitteRepository){
+        //     return $this->json($QuitteRepository->getProfession_By_personne($id), 200, []);
+        // }
     }

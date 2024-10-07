@@ -97,37 +97,100 @@ class PayementCotisationRepository extends ServiceEntityRepository
         return $DevisList;
     }
     public function getStatCotisation()
-{
-    $sql = "SELECT 
-        TO_CHAR(date_de_payement, 'YYYY-MM') AS mois, 
-        SUM(montant_cotisation_total_payer) AS total_paye_par_mois
-    FROM 
-        payement_cotisation
-    WHERE 
-        date_de_payement >= NOW() - INTERVAL '7 months'
-    GROUP BY 
-        TO_CHAR(date_de_payement, 'YYYY-MM')
-    ORDER BY 
-        mois DESC";
+    {
+        $sql = "SELECT 
+            TO_CHAR(date_de_payement, 'YYYY-MM') AS mois, 
+            SUM(montant_cotisation_total_payer) AS total_paye_par_mois
+        FROM 
+            payement_cotisation
+        WHERE 
+            date_de_payement >= NOW() - INTERVAL '7 months'
+        GROUP BY 
+            TO_CHAR(date_de_payement, 'YYYY-MM')
+        ORDER BY 
+            mois DESC";
+        
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
+    public function getAllRecue($id, $annee = null)
+    {
+        $sql = 'SELECT pm.*, COALESCE(SUM(pc.montant_cotisation_total_payer), 0) as total
+                FROM personne_membre pm
+                LEFT JOIN payement_cotisation pc ON pm.id = pc.id_personne_membre_id
+                WHERE pm.id = :id';
+        
+        if ($annee !== null) {
+            $sql .= ' AND EXTRACT(YEAR FROM pc.date_payer) = :annee';
+        }
+
+        $sql .= ' GROUP BY pm.id';
+        
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        
+        $stmt->bindParam(':id', $id, \PDO::PARAM_INT);
+        
+        if ($annee !== null) {
+            $stmt->bindParam(':annee', $annee, \PDO::PARAM_INT);
+        }
+
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAssociative();
+    }
+    public function getAllRecueFamille($id, PersonneMembreRepository $personneMembreRepository): float  
+    {
+        $Famille = [];
+        $Pers_Responsable = $this->getAllRecue($id);
+        $Famille[] = $Pers_Responsable;
+        $Vady = $personneMembreRepository->getPersonne_Couple($id);
+        for ($j = 0; $j < count($Vady); $j++) {
+            $Perso_couple = $this->getAllRecue($Vady[$j]['idcouple']);
+            $Famille[] = $Perso_couple;
+        }
+        $Zanaka = $personneMembreRepository->getPersonne_Enfant($id);
+        for ($k = 0; $k < count($Zanaka); $k++) {
+            $personne_membre_zanaka = $this->getAllRecue($Zanaka[$k]['idenfant']);
+            $Famille[] = $personne_membre_zanaka;
+        }
+        $total = 0;
+        for ($i = 0; $i < count($Famille); $i++) {
+            $total = $total + $Famille[$i]['total'];
+        }
+        return $total;
+    }
+    public function getAllRecueFamilleBy($id, $annee , PersonneMembreRepository $personneMembreRepository): float  
+    {
+        $Famille = [];
+        $Pers_Responsable = $this->getAllRecue($id , $annee);
+        $total = 0;
+        if($Pers_Responsable != null){
+            $Famille[] = $Pers_Responsable;
+            $Vady = $personneMembreRepository->getPersonne_Couple($id);
+            for ($j = 0; $j < count($Vady); $j++) {
+                $Perso_couple = $this->getAllRecue($Vady[$j]['idcouple'] ,  $annee);
+                $Famille[] = $Perso_couple;
+            }
+            $Zanaka = $personneMembreRepository->getPersonne_Enfant($id);
+            for ($k = 0; $k < count($Zanaka); $k++) {
+                $personne_membre_zanaka = $this->getAllRecue($Zanaka[$k]['idenfant'] , $annee);
+                $Famille[] = $personne_membre_zanaka;
+            }
+            for ($i = 0; $i < count($Famille); $i++) {
+                $total = $total + $Famille[$i]['total'];
+            }
+        }
+        return $total;
+    }
     
-    $conn = $this->getEntityManager()->getConnection();
-    
-    $stmt = $conn->prepare($sql);
-    $resultSet = $stmt->executeQuery();
-    
-    return $resultSet->fetchAllAssociative();
-}
-public function getAllRecue()
-{
-    $sql = "";
-    
-    $conn = $this->getEntityManager()->getConnection();
-    
-    $stmt = $conn->prepare($sql);
-    $resultSet = $stmt->executeQuery();
-    
-    return $resultSet->fetchAllAssociative();
-}
+
+
     
     
     //    /**

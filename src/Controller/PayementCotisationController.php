@@ -74,4 +74,20 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function Devis($idPersonne_Resposable, $nbr_mois,  PayementCotisationRepository $PayementCotisationRepository){
             return $this->json($PayementCotisationRepository->Cotisation_Total($idPersonne_Resposable, $nbr_mois),200,[]);
         }
+        #[Route('/api/getAllRecueTotal/{idPersonne_Resposable}',name:'getAllRecueTotal',methods:'GET')]
+        public function getAllRecueTotal($idPersonne_Resposable,  PayementCotisationRepository $PayementCotisationRepository){
+            return $this->json($PayementCotisationRepository->getAllRecue($idPersonne_Resposable),200,[]);
+        }
+        #[Route('/api/getAllRecueByAnnee/{idPersonne_Resposable}/{annee}',name:'getAllRecueByAnnee',methods:'GET')]
+        public function getAllRecueByAnnee($idPersonne_Resposable,$annee ,  PayementCotisationRepository $PayementCotisationRepository){
+            return $this->json($PayementCotisationRepository->getAllRecue($idPersonne_Resposable , $annee),200,[]);
+        }
+        #[Route('/api/getAllRecueFamille/{idPersonne_Resposable}',name:'getAllRecueFamille',methods:'GET')]
+        public function getAllRecueFamille($idPersonne_Resposable ,  PayementCotisationRepository $PayementCotisationRepository , PersonneMembreRepository $personneMembreRepository){
+            return $this->json($PayementCotisationRepository->getAllRecueFamille($idPersonne_Resposable , $personneMembreRepository),200,[]);
+        }
+        #[Route('/api/getAllRecueFamilleBy/{idPersonne_Resposable}/{annee}',name:'getAllRecueFamilleBy',methods:'GET')]
+        public function getAllRecueFamilleBy($idPersonne_Resposable , $annee,  PayementCotisationRepository $PayementCotisationRepository , PersonneMembreRepository $personneMembreRepository){
+            return $this->json($PayementCotisationRepository->getAllRecueFamilleBy($idPersonne_Resposable  , $annee , $personneMembreRepository),200,[]);
+        }
     } 

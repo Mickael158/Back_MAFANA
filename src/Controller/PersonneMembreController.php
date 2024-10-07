@@ -102,6 +102,21 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         {
             return $this->json($personneMembreRepository->getPersIndepNotUser() , 200, []);
         }
+        #[Route('/api/getAnneInscription/{id}', name: 'getAnneInscription', methods: ['GET'])]
+        public function getAnneInscription($id , PersonneMembreRepository $personneMembreRepository)
+        {
+            $now = (new \DateTime())->format('Y');;
+            $nowInt = $now + 0;
+            $inscription = $personneMembreRepository->getAnneInscription($id);
+            $inscriptionInt = $inscription['annee_de_naissance']+0;
+            $AllDates = [] ;
+            $AllDates[] = $inscriptionInt;
+            while($inscriptionInt < $nowInt) {
+                $inscriptionInt = $inscriptionInt + 1;
+                $AllDates[] = $inscriptionInt;
+            }
+            return $this->json($AllDates , 200, []);
+        }
         #[Route('/api/getPersNotQuitte', name: 'selectId_Personne_not_quitte', methods: ['GET'])]
         public function Personne_independant_not_quitte(PersonneMembreRepository $personneMembreRepository)
         {
@@ -109,12 +124,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         }
         #[Route('/api/Etat',name:'insetion_DemandeFinacier',methods:'GET')]
         public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
-            $personneAll = $personneMembreRepository->findAll();
+            $personneAll = $personneMembreRepository->getPersIndep();
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $this->pourcentageAA(2, $personneMembreRepository, $demandeFinancierRepository);
-                $personne = $personneMembreRepository->find($personneAll[$i]->getId());
+                $pourcentage = $demandeFinancierRepository->pourcentage($personneAll[$i]['id']);
+                $personne = $personneMembreRepository->find($personneAll[$i]['id']);
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
                 $personnefin[] = $investigationFinancier;
