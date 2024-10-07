@@ -96,6 +96,17 @@ class PayementCotisationRepository extends ServiceEntityRepository
         $DevisList[] = $Perso_Enfant;
         return $DevisList;
     }
+    public function getAllPayementCotisation()
+    {
+        $sql = "select * from payement_cotisation;";
+        
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
     public function getStatCotisation()
     {
         $sql = "SELECT 

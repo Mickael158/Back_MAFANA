@@ -25,7 +25,7 @@ class GenreRepository extends ServiceEntityRepository
         $stmt->bindValue('nom_genre', $nom_genre);
         $resultSet = $stmt->executeQuery();
         
-        return $resultSet->fetchAllAssociative();
+        return $resultSet->fetchAssociative();
     }
     //    /**
     //     * @return Genre[] Returns an array of Genre objects

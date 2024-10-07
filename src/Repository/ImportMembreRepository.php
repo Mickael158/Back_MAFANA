@@ -94,6 +94,17 @@ class ImportMembreRepository extends ServiceEntityRepository
         
         return $resultSet->fetchAllAssociative();
     }
+    public function getImportDistinctPeronne()
+    {
+        $sql = 'select DISTINCT ON (anarana , fanampiny , daty_naterahana , lahy_na_vavy , adiresy_eto_antananarivo , trangobe , fiaviana_antanana , laharana_finday , mailaka) * from import_membre;';
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
 
     //    /**
     //     * @return ImportMembre[] Returns an array of ImportMembre objects

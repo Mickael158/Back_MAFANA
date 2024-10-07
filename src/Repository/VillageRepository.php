@@ -15,6 +15,18 @@ class VillageRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Village::class);
     }
+    public function getVillage_by_nomVillage(String $nom_village)
+    {
+        $sql = 'select * from village where nom_village=:nom_village';
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue('nom_village', $nom_village);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAssociative();
+    }
 
     //    /**
     //     * @return Village[] Returns an array of Village objects
