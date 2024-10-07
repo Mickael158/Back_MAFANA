@@ -185,7 +185,7 @@ class PersonneMembreRepository extends ServiceEntityRepository
         return $resultSet->fetchAssociative();
     }
 
-    public function getPersonne_Couple(int $id_personne)
+    public function  getPersonne_Couple(int $id_personne)
     {
         $sql = 'SELECT 
     CASE 
@@ -248,6 +248,24 @@ ORDER BY
         $resultSet = $stmt->executeQuery();
         
         return $resultSet->fetchAllAssociative();
+    }
+
+    public function PersonneCharge_ByResposanble(int $id_personne): array
+    {
+        $Famille = [];
+        $Resposable = $this->find($id_personne);
+        $Famille[] = $Resposable;
+        $Vady = $this->getPersonne_Couple($id_personne);
+        for ($j = 0; $j < count($Vady); $j++) {
+            $personne_membre_vady = $this->find($Vady[$j]['idcouple']);
+            $Famille[] = $personne_membre_vady;
+        }
+        $Zanaka = $this->getPersonne_Enfant($id_personne);
+        for ($k = 0; $k < count($Zanaka); $k++) {
+            $personne_membre_zanaka = $this->find($Zanaka[$k]['idenfant']);
+            $Famille[] = $personne_membre_zanaka;
+        }
+        return $Famille;
     }
     //    /**
     //     * @return PersonneMembre[] Returns an array of PersonneMembre objects

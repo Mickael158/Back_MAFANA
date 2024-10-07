@@ -82,6 +82,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json($PersonneMembreRepository->findBy(['Id_Genre'=>$genrePersonne[0]]), 200, []);
         }
 
+        #[Route('/api/PersonneCharge_ByResposanble/{id}',name:'PersonneCharge_ByResposanble',methods:'GET')]
+        public function PersonneCharge_ByResposanble($id , PersonneMembreRepository $PersonneMembreRepository){
+
+            return $this->json($PersonneMembreRepository->PersonneCharge_ByResposanble($id), 200, []);
+        }
         #[Route('/api/PersonneEnfant',name:'select_Personne_non_marie',methods:'GET')]
         public function MembreEnfant(PersonneMembreRepository $PersonneMembreRepository){
 
@@ -106,14 +111,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
             $personneAll = $personneMembreRepository->findAll();
             $personnefin = [];
-            $demande_initial = $demandeFinancierRepository->getDemanceFinancier_With_Investi();
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $demandeFinancierRepository->pourcentage($personneAll[$i]->getId());
+                $pourcentage = $this->pourcentageAA(2, $personneMembreRepository, $demandeFinancierRepository);
                 $personne = $personneMembreRepository->find($personneAll[$i]->getId());
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
-                $personnefin[] = $investigationFinancier; 
+                $personnefin[] = $investigationFinancier;
             }
             return $this->json($personnefin, 200, []);
         }
