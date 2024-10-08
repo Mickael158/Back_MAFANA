@@ -2,34 +2,27 @@
 namespace App\EventListener;
 
 use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
+use App\Service\RoleSuspensionService;
+use Psr\Log\LoggerInterface;
 
 class JWTCreatedListener
 {
-    /**
-     * Ajoute des informations supplémentaires dans le token JWT
-     */
-    public function onJWTCreated(JWTCreatedEvent $event)
+    private RoleSuspensionService $roleSuspensionService;
+
+    public function __construct(RoleSuspensionService $roleSuspensionService)
     {
-        // Récupérer les données actuelles du token
+        $this->roleSuspensionService = $roleSuspensionService;
+    }
+
+    public function onJWTCreateda(JWTCreatedEvent $event)
+    {
         $data = $event->getData();
         $user = $event->getUser();
 
-        // Ajoute des informations supplémentaires concernant l'utilisateur
-        $data['id'] = $user->getId();
-        $data['username'] = $user->getUsername();
-        $data['roles'] = $user->getRoles();
-
-        // Récupérer des informations depuis l'entité liée PersonneMembre
-        $personne = $user->getIdPersonne();
-        if ($personne) {
-            $data['personne'] = [
-                'id' => $personne->getId(),
-                'nom' => $personne->getNom(),
-                'prenom' => $personne->getPrenom(),
-            ];
-        }
-
-        // Mettre à jour les données du token
+        $filteredRoles = $this->roleSuspensionService->filterRoles($user);
+        $data['roles'] = [];
+        $data['userId'] = $user->getId();
+        dump($data);
         $event->setData($data);
     }
 }

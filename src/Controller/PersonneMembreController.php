@@ -97,6 +97,26 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         {
             return $this->json($personneMembreRepository->getPersIndep() , 200, []);
         }
+        #[Route('api/recherchePersonneIndep',name:'RecherchePersonneIndep',methods:'POST')]
+        public function RecherchePersonneIndep(Request $request, PersonneMembreRepository $personneMembreRepository){
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+                
+            $searchData = $data_decode['data'] ?? null; 
+            $village = $data_decode['village'] ?? null; 
+            $results = $personneMembreRepository->getPersIndepRecherche($searchData, $village);
+            if ($results) {
+                return $this->json([
+                    'success' => true,
+                    'data' => $results,
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+                ]);
+            }
+        }
         #[Route('/api/getPersIndepNotUser', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
         public function Personne_independant_not_user(PersonneMembreRepository $personneMembreRepository)
         {
@@ -122,9 +142,14 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         {
             return $this->json($personneMembreRepository->getPersNotQuitte() , 200, []);
         }
-        #[Route('/api/Etat',name:'insetion_DemandeFinacier',methods:'GET')]
-        public function selectAll_DemandeFinacier(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
-            $personneAll = $personneMembreRepository->getPersIndep();
+        #[Route('/api/Etat',name:'insetion_DemandeFinacier',methods:'POST')]
+        public function selectAll_DemandeFinacier(Request $request,DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , PersonneMembreRepository $personneMembreRepository){
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+                
+            $searchData = $data_decode['data'] ?? null; 
+            $village = $data_decode['village'] ?? null; 
+            $personneAll = $personneMembreRepository->getPersIndepRecherche($searchData  , $village);
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();

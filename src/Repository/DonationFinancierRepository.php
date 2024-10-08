@@ -38,6 +38,27 @@ ORDER BY
     return $resultSet->fetchAllAssociative();
 }
 
+public function rechercheDonation($data, $dataeDebut, $dataeFin)
+{
+    $sql = "SELECT * FROM donation_financier WHERE 1=1"; 
+
+    if ($data !== null) {
+        $sql .= " AND nom_donation_financier = '" . $data . "'";
+    }
+    if ($dataeDebut !== null && $dataeFin !== null) {
+        $sql .= " AND date_donation_financier BETWEEN '" . $dataeDebut . "' AND '" . $dataeFin . "'";
+    }
+    if ($data == null && $dataeDebut == null && $dataeFin == null) {
+        $sql .= " LIMIT 10";
+    }
+
+    $conn = $this->getEntityManager()->getConnection();
+    $stmt = $conn->query($sql);
+
+    return $stmt->fetchAllAssociative();
+}
+
+
     //    /**
     //     * @return DonationFinancier[] Returns an array of DonationFinancier objects
     //     */

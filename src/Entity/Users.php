@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UsersRepository;
+use App\Service\RoleSuspensionService;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -36,6 +37,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?PersonneMembre $Id_Personne = null;
 
+
+    public function __construct(private readonly RoleSuspensionService $roleSuspensionService)
+    {
+    }
 
     public function getId(): ?int
     {
@@ -71,8 +76,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
+        $this->setRoles($this->roles);
         $roles = $this->roles;
-
+       
         return array_unique($roles);
     }
 
@@ -82,7 +88,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 

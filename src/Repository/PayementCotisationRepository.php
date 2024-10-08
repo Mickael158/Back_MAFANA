@@ -199,7 +199,37 @@ class PayementCotisationRepository extends ServiceEntityRepository
         }
         return $total;
     }
+
     
+    
+    public function rechercheCotisation($data, $village, $dataeDebut, $dataeFin)
+    {
+        $sql = "SELECT p.*, cp.* 
+                FROM personne_membre p
+                JOIN payement_cotisation cp ON p.id = cp.id_personne_membre_id 
+                WHERE 1=1"; 
+
+        if ($data !== null) {
+            $sql .= " AND (p.nom_membre = '".$data."' OR p.prenom_membre = '".$data."' OR p.telephone = '".$data."')";
+        }
+        if ($village !== null) {
+            $sql .= " AND p.id_village_id = ".$village;
+        }
+        if ($dataeDebut !== null && $dataeFin !== null) {
+            $sql .= " AND cp.data_payer BETWEEN '".$dataeDebut."' AND '".$dataeFin."'";
+        }
+        if($data == null && $village == null && $dataeDebut == null && $dataeFin == null){
+            $sql .= " LIMIT 10";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
+
 
 
     

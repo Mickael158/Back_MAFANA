@@ -16,6 +16,30 @@ class DonnationMaterielRepository extends ServiceEntityRepository
         parent::__construct($registry, DonnationMateriel::class);
     }
 
+
+    public function rechercheMateriel($data, $materiel,$dataeDebut, $dataeFin)
+    {
+        $sql = "SELECT dm.*,m.* FROM donnation_materiel dm
+        JOIN materiel m ON dm.id_materiel_id = m.id  WHERE 1=1"; 
+
+        if ($data !== null) {
+            $sql .= " AND dm.nom_donnateur_materiel = '" . $data . "'";
+        }
+        if ($materiel !== null) {
+            $sql .= " AND dm.id_materiel_id = ".$materiel;
+        }
+        if ($dataeDebut !== null && $dataeFin !== null) {
+            $sql .= " AND dm.date_acquisition BETWEEN '" . $dataeDebut . "' AND '" . $dataeFin . "'";
+        }
+        if ($data == null && $dataeDebut == null && $dataeFin == null) {
+            $sql .= " LIMIT 10";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->query($sql);
+
+        return $stmt->fetchAllAssociative();
+    }
     //    /**
     //     * @return DonnationMateriel[] Returns an array of DonnationMateriel objects
     //     */

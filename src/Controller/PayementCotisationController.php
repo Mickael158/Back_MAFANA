@@ -13,6 +13,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -90,4 +91,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function getAllRecueFamilleBy($idPersonne_Resposable , $annee,  PayementCotisationRepository $PayementCotisationRepository , PersonneMembreRepository $personneMembreRepository){
             return $this->json($PayementCotisationRepository->getAllRecueFamilleBy($idPersonne_Resposable  , $annee , $personneMembreRepository),200,[]);
         }
+
+        #[Route('/api/rechercheCotisation', name: 'rechercheCotisation', methods: 'POST')]
+    public function rechercheCotisation(Request $request, PayementCotisationRepository $payementCotisationRepository)
+    {
+        $data = $request->getContent();
+        $data_decode = json_decode($data, true);
+        // Extraction des paramètres
+        $searchData = $data_decode['data'] ?? null; // Données de recherche
+        $village = $data_decode['village'] ?? null; // Village
+        $dateDebut = $data_decode['dateDebut'] ?? null; // Date de début
+        $dateFin = $data_decode['dateFin'] ?? null; // Date de fin
+            
+        // Vérification des paramètres
+        $results = $payementCotisationRepository->rechercheCotisation($searchData, $village, $dateDebut, $dateFin);
+
+        // Retour des résultats en fonction des conditions
+        if ($results) {
+            return $this->json([
+                'success' => true,
+                'data' => $results,
+            ]);
+        } else {
+            return $this->json([
+                'success' => false,
+                'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+            ]);
+        }
+    }
+
+
     } 

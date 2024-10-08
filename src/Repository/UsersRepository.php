@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PersonneMembre;
+use App\Entity\RoleSuspendu;
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,18 +35,9 @@ class UsersRepository extends ServiceEntityRepository implements PasswordUpgrade
         $this->getEntityManager()->flush();
     }
 
-    public function  getUserByPersonneByPassword(PersonneMembre $personne,$Password){
-        $users = $this->createQueryBuilder('users')
-        ->select('users')
-        ->where('users.Id_Personne = :Personne')
-        ->setParameter('Personne',$personne)
-        ->getQuery()
-        ->getOneOrNullResult();
-        if($users && password_verify($Password,$users->getPassword())){
-            return $users;
-        }
-        return null;
-    }
+    
+
+    
 
     //    /**
     //     * @return User[] Returns an array of User objects

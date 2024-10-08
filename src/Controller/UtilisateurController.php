@@ -5,10 +5,13 @@ use App\Entity\Suivis;
 use App\Entity\Users;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\RoleRepository;
+use App\Repository\RoleSuspenduRepository;
 use App\Repository\UtilisateurMembreRepository;
 use App\Repository\UsersRepository;
+use App\Service\RoleSuspensionService;
 use Doctrine\ORM\EntityManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Event\JWTCreatedEvent;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -69,6 +72,9 @@ class UtilisateurController extends AbstractController
             return null;
         }
     }
+
+   
+    
 
 
     #[Route('/api/session-user', name: 'session_user', methods: ['GET'])]

@@ -66,4 +66,27 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectAll(DonationFinancierRepository $donationFinancierRepository){
             return $this->json($donationFinancierRepository->findAll(), 200, []);
         }
-    }
+
+        #[Route('api/rechercheDonnation',name:'RechercheDon',methods:'POST')]
+        public function rechercheDonnation(Request $request, DonationFinancierRepository $donationFinancierRepository){
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+                
+            $searchData = $data_decode['data'] ?? null; 
+            $dateDebut = $data_decode['dateDebut'] ?? null;
+            $dateFin = $data_decode['dateFin'] ?? null; 
+            $results = $donationFinancierRepository->rechercheDonation($searchData, $dateDebut, $dateFin);
+            if ($results) {
+                return $this->json([
+                    'success' => true,
+                    'data' => $results,
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+                ]);
+            }
+        }
+        
+}
