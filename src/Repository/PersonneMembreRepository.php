@@ -180,7 +180,6 @@ class PersonneMembreRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
-
     public function getPersIndepNotUser()
     {
         // Requête SQL
@@ -384,6 +383,35 @@ ORDER BY
             $Famille[] = $personne_membre_zanaka;
         }
         return $Famille;
+    }
+
+    public function recherchePersonneAll($data, $village, $genre, $profession){
+        $sql = "select pm.* from personne_membre pm
+    JOIN Village v on v.id = pm.id_village_id
+    JOIN Genre g on g.id = pm.id_genre_id
+    JOIN personne_membre_profession pmp on pmp.id_personne_membre_id = pm.id
+    WHERE 1=1";
+        if($data !== null){
+            $sql.= " AND (pm.nom_membre = '".$data."' OR pm.prenom_membre = '".$data."' OR pm.telephone = '".$data."' OR pm.email='".$data."')";
+        }
+        if($village !== null){
+            $sql.= " AND v.id = ".$village;
+        }
+        if($genre !== null){
+            $sql.= " AND g.id = ".$genre;
+        }
+        if($profession !== null){
+            $sql.= " AND pmp.id_profession_id = ".$profession;
+        }
+        if($data == null && $village == null && $genre == null && $profession == null){
+            $sql .= " LIMIT 10";
+        }
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
     }
     //    /**
     //     * @return PersonneMembre[] Returns an array of PersonneMembre objects

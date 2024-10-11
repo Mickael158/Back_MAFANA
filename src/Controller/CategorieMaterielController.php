@@ -40,7 +40,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Categorie Supprimer'], 200, []);
         }
 
-        #[Route('/api/Categorie',name:'selectAll_Categorie',methods:'GET')]
+        #[Route('/api/Categories',name:'selectAll_Categories',methods:'GET')]
         public function selectAll(CategorieMaterielRepository $CategorieMaterielRepository){
             return $this->json($CategorieMaterielRepository->findAll(), 200, []);
         }

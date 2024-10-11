@@ -9,6 +9,7 @@ use App\Repository\VillageRepository;
 use App\Repository\GenreRepository;
 use App\Service\InvestigationFinancier;
 use Doctrine\ORM\EntityManagerInterface;
+use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,6 +73,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json($PersonneMembreRepository->findAll(), 200, []);
         }
 
+        
+
         #[Route('/api/Personne/{id}',name:'selectId_Personne',methods:'GET')]
         public function selectById($id,PersonneMembreRepository $PersonneMembreRepository){
             return $this->json($PersonneMembreRepository->find($id), 200, []);
@@ -117,6 +120,56 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ]);
             }
         }
+
+        #[Route('api/recherchePersonne',name:'RecherchePersonne',methods:'POST')]
+        public function RecherchePersonne(Request $request, PersonneMembreRepository $personneMembreRepository){
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+                
+            $searchData = $data_decode['data'] ?? null; 
+            $village = $data_decode['village'] ?? null; 
+            $genre = $data_decode['genre'] ?? null; 
+            $profession = $data_decode['professin'] ?? null; 
+            $results = $personneMembreRepository->recherchePersonneAll($searchData, $village, $genre, $profession);
+            if ($results) {
+                return $this->json([
+                    'success' => true,
+                    'data' => $results,
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+                ]);
+            }
+        }
+
+        #[Route('/api/Personne/update/{id}',name:'Update_Evenement',methods:'POST')]
+        public function Update(PersonneMembre $personneMembre,EntityManagerInterface $em,Request $request,GenreRepository $genreRepository,VillageRepository $villageRepository){
+        $data = $request->getContent();
+        $data_decode = json_decode($data,true);
+        $genre = $genreRepository->find($data_decode['genre_id']);
+        $village = $villageRepository->find($data_decode['village_id']);
+        $personneMembre
+                ->setNomMembre($data_decode['Nom'])
+                ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
+                ->setAddress($data_decode['Adresse'])
+                ->setEmail($data_decode['Email'])
+                ->setTelephone($data_decode['Telephone'])
+                ->setPrenomMembre($data_decode['Prenom'])
+                ->setDateInscription(new \DateTime())
+                ->setIdVillage($village)
+                ->setIdGenre($genre);
+        $em->flush();
+        return $this->json(['message'=>'Association modifier'], 200, []);
+        }
+
+        #[Route('/api/PersonneAllById/{id}', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
+        public function PersonneAllById(PersonneMembreRepository $personneMembreRepository)
+        {
+            return $this->json($personneMembreRepository->getPersIndepNotUser() , 200, []);
+        }
+
         #[Route('/api/getPersIndepNotUser', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
         public function Personne_independant_not_user(PersonneMembreRepository $personneMembreRepository)
         {

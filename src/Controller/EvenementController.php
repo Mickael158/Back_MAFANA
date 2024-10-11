@@ -57,10 +57,36 @@ class EvenementController extends AbstractController
             return $this->json(['message' => 'Evenement Supprimer'], 200, []);
         }
 
+        #[Route('/api/Evenement/{id}',name:'findBy_Evenement',methods:'GET')]
+        public function findById(Evenement $evenement){
+            return $this->json($evenement, 200, []);
+        }
+
+        #[Route('/api/Evenement/update/{id}',name:'Update_Evenement',methods:'POST')]
+        public function Update(Evenement $evenement,EntityManagerInterface $em,Request $request,JWTEncoderInterface $jWTEncoderInterface,UsersRepository $usersRepository,TypeEvenementRepository $typeEvenementRepository){
+        $data = $request->getContent();
+        $data_decode = json_decode($data,true);
+        $decode = $jWTEncoderInterface->decode($data_decode['user_id']);
+        $utilisateur = $usersRepository->findOneBy(['username'=>$decode['username']]);
+        $typeEvenement = $typeEvenementRepository->find($data_decode['typeEvenement_id']);
+        $evenement
+            ->setIdUtilisateur($utilisateur)
+            ->setIdTypeEvenement($typeEvenement)
+            ->setDescriptionEvenement($data_decode['description'])
+            ->setDateEvenement(new DateTime($data_decode['date_debut']))
+            ->setDatePublication(new DateTime())
+            ->setDateFinEvenement(new DateTime($data_decode['date_fin']))
+            ->setLieuEvenement($data_decode['lieu'])
+            ->setNom($data_decode['nom']);
+        $em->flush();
+            return $this->json(['message'=>'Association modifier'], 200, []);
+        }
+
         #[Route('/api/Evenement',name:'selectAll_Evenement',methods:'GET')]
         public function selectAll(EvenementRepository $EvenementRepository){
             return $this->json($EvenementRepository->findAll(), 200, []);
         }
+
         #[Route('/api/Evenement/proche_evenement',name:'select3_proche_evenement',methods:'GET')]
         public function select3_proche_evenement(EvenementRepository $EvenementRepository){
             return $this->json($EvenementRepository->get3_proche_evenement(), 200, []);
