@@ -19,10 +19,9 @@ class JWTCreatedListener
         $data = $event->getData();
         $user = $event->getUser();
 
-        $filteredRoles = $this->roleSuspensionService->filterRoles($user);
-        $data['roles'] = [];
+        $filteredRoles = $this->roleSuspensionService->filterRoles($user->getRoles());
+        $data['roles'] = $filteredRoles;
         $data['userId'] = $user->getId();
-        dump($data);
         $event->setData($data);
     }
 }

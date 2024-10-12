@@ -18,9 +18,7 @@ class RoleSuspenduRepository extends ServiceEntityRepository
 
     public function  getRolesSuspendues(){
         
-        $sql = '
-        select r.* from role_suspendu r where NOW() BETWEEN r.date_suspension AND r.date_fin_suspension OR r.date_fin_suspension IS NULL;;
-        ';
+        $sql = 'select r.* from role_suspendu r where NOW() BETWEEN r.date_suspension AND r.date_fin_suspension OR r.date_fin_suspension IS NULL';
 
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);

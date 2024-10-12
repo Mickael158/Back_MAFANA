@@ -3,6 +3,7 @@
 
 use App\Entity\DemandeFinancier;
 use App\Entity\PersonneMembre;
+use App\Entity\RestaurationMembre;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\VillageRepository;
@@ -33,7 +34,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ->setEmail($data_decode['Email'])
                 ->setTelephone($data_decode['Telephone'])
                 ->setPrenomMembre($data_decode['Prenom'])
-                ->setDateInscription(new \DateTime())
+                ->setDateInscription(new \DateTime($data_decode['DateInscription']))
                 ->setIdVillage($village)
                 ->setIdGenre($genre);
             $em->persist($Personne);
@@ -129,7 +130,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $searchData = $data_decode['data'] ?? null; 
             $village = $data_decode['village'] ?? null; 
             $genre = $data_decode['genre'] ?? null; 
-            $profession = $data_decode['professin'] ?? null; 
+            $profession = $data_decode['profession'] ?? null; 
             $results = $personneMembreRepository->recherchePersonneAll($searchData, $village, $genre, $profession);
             if ($results) {
                 return $this->json([
@@ -144,7 +145,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             }
         }
 
-        #[Route('/api/Personne/update/{id}',name:'Update_Evenement',methods:'POST')]
+        #[Route('/api/Personne/update/{id}',name:'Update_personne',methods:'POST')]
         public function Update(PersonneMembre $personneMembre,EntityManagerInterface $em,Request $request,GenreRepository $genreRepository,VillageRepository $villageRepository){
         $data = $request->getContent();
         $data_decode = json_decode($data,true);
@@ -161,13 +162,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ->setIdVillage($village)
                 ->setIdGenre($genre);
         $em->flush();
-        return $this->json(['message'=>'Association modifier'], 200, []);
+        return $this->json(['message'=>'Information du personne modifié'], 200, []);
         }
 
-        #[Route('/api/PersonneAllById/{id}', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
-        public function PersonneAllById(PersonneMembreRepository $personneMembreRepository)
+        #[Route('/api/PersonneAllById/{id}', name: 'PersonneAllByd', methods: ['GET'])]
+        public function PersonneAllById(PersonneMembre $personneMembre)
         {
-            return $this->json($personneMembreRepository->getPersIndepNotUser() , 200, []);
+            return $this->json($personneMembre , 200, []);
         }
 
         #[Route('/api/getPersIndepNotUser', name: 'selectId_Personne_indep_not_user', methods: ['GET'])]
@@ -249,6 +250,22 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             }
 
             return ($mois_a_payer * 100) / $mois_total;
+        }
+
+        #[Route('/api/personneQuitter',name:'personneAll_quitter',methods:'GET')]
+        public function getPersonneQuitter(PersonneMembreRepository $personneMembreRepository){
+            return $this->json(['reponse'=>$personneMembreRepository->getPersonneQuitter()],200,[]);
+        }
+
+        #[Route('/api/personneRestaurer/{id}',name:'personne_restaurer',methods:'POST')]
+        public function PersonneRestorer(PersonneMembre $personneMembre,EntityManagerInterface $em){
+            $restaurer = new RestaurationMembre();
+            $restaurer
+                ->setDateRestauration(new \DateTime())
+                ->setIdPersonneMembre($personneMembre);
+            $em->persist($restaurer);
+            $em->flush();
+            return $this->json(['message'=>'Membre restaurer'],200,[]);
         }
     }
 

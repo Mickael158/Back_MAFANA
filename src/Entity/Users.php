@@ -37,11 +37,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?PersonneMembre $Id_Personne = null;
 
-
-    public function __construct(private readonly RoleSuspensionService $roleSuspensionService)
-    {
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -76,7 +71,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $this->setRoles($this->roles);
         $roles = $this->roles;
        
         return array_unique($roles);
