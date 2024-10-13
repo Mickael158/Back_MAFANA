@@ -443,6 +443,17 @@ WHERE q.date > COALESCE((
 
         return $resultSet->fetchAllAssociative();
     }
+    public function getPersonneByNomAndPrenom($nom,$prenom)
+    {
+        return $this->createQueryBuilder('p')
+            ->select('p')
+            ->where('p.Nom_Membre = :nom')
+            ->andWhere('p.Prenom_Membre = :prenom')
+            ->setParameter('nom',$nom)
+            ->setParameter('prenom',$prenom)
+            ->getQuery()
+            ->getResult();
+    }
     //    /**
     //     * @return PersonneMembre[] Returns an array of PersonneMembre objects
     //     */

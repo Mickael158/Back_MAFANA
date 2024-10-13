@@ -21,26 +21,41 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
     class PersonneMembreController extends AbstractController{
 
         #[Route('/api/Personne',name:'insetion_Personne',methods:'POST')]
-        public function inerer(Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository){
-            $Personne = new PersonneMembre();
+        public function inerer(Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository,PersonneMembreRepository $personneMembreRepository){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $village = $villageRepository->find($data_decode['IdVillage']);
-            $genre = $genreRepository->find($data_decode['IdGenre']);
-            $Personne
-                ->setNomMembre($data_decode['Nom'])
-                ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
-                ->setAddress($data_decode['Adresse'])
-                ->setEmail($data_decode['Email'])
-                ->setTelephone($data_decode['Telephone'])
-                ->setPrenomMembre($data_decode['Prenom'])
-                ->setDateInscription(new \DateTime($data_decode['DateInscription']))
-                ->setIdVillage($village)
-                ->setIdGenre($genre);
-            $em->persist($Personne);
-            $em->flush();
-            return $this->json(['message' => 'Personne inserer'], 200, []);
+            $result = $personneMembreRepository->getPersonneByNomAndPrenom($data_decode['Nom'],$data_decode['Prenom']);
+            if($result){
+                return $this->json(['error'=>'Cette personne est dejas ennregistrer!'],200,[]);
+            }else{
+                $Personne = new PersonneMembre();
+                $village = $villageRepository->find($data_decode['IdVillage']);
+                $genre = $genreRepository->find($data_decode['IdGenre']);
+                $Personne
+                    ->setNomMembre($data_decode['Nom'])
+                    ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
+                    ->setAddress($data_decode['Adresse'])
+                    ->setEmail($data_decode['Email'])
+                    ->setTelephone($data_decode['Telephone'])
+                    ->setPrenomMembre($data_decode['Prenom'])
+                    ->setDateInscription(new \DateTime($data_decode['DateInscription']))
+                    ->setIdVillage($village)
+                    ->setIdGenre($genre);
+                $em->persist($Personne);
+                $em->flush();
+                return $this->json(['message' => 'Personne inserer'], 200, []);
+            }
         }
+
+        #[Route('/api/PersonneTest',name:'Test_Personne',methods:'POST')]
+        public function Test(Request $request,PersonneMembreRepository $personneMembreRepository){
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+            $result = $personneMembreRepository->getPersonneByNomAndPrenom($data_decode['nom'],$data_decode['prenom']);
+            return $this->json($result,200,[]);
+        }
+
+
 
         #[Route('/api/Personne/{id}',name:'modification_Personne',methods:'POST')]
         public function modifier(PersonneMembre $Personne,Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository){
