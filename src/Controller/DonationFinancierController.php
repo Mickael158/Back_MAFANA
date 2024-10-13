@@ -3,11 +3,13 @@
 
 use App\Entity\DonationFinancier;
 use App\Entity\DonnationMateriel;
+use App\Entity\PersonneMembre;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\DonationFinancierRepository;
 use App\Repository\DonnationMaterielRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\UsersRepository;
+use App\Service\AffichageDonationFinancier;
 use App\Service\InvestigationFinancier;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -68,18 +70,29 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         }
 
         #[Route('api/rechercheDonnation',name:'RechercheDon',methods:'POST')]
-        public function rechercheDonnation(Request $request, DonationFinancierRepository $donationFinancierRepository){
+        public function rechercheDonnation(Request $request, DonationFinancierRepository $donationFinancierRepository , PersonneMembreRepository $personneMembreRepository){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-                
+            $affichage = [];
             $searchData = $data_decode['data'] ?? null; 
             $dateDebut = $data_decode['dateDebut'] ?? null;
             $dateFin = $data_decode['dateFin'] ?? null; 
             $results = $donationFinancierRepository->rechercheDonation($searchData, $dateDebut, $dateFin);
-            if ($results) {
+            for($i = 0 ; $i < count($results) ; $i++){
+                $nom_prenom = explode(' ',$results[$i]['nom_donation_financier']);
+                $prenom = implode(' ', array_slice($nom_prenom, 1));
+                $search_personne = $personneMembreRepository->getPersonneByNomPrenom($nom_prenom[0] , $prenom);
+                $affichageDonationFinancier = new AffichageDonationFinancier();
+                $affichageDonationFinancier->setNomDonationFinancier($results[$i]['nom_donation_financier']);
+                $affichageDonationFinancier->setDateDonationFinancier(new \DateTime($results[$i]['date_donation_financier']));
+                $affichageDonationFinancier->setMontant($results[$i]['montant']);
+                $affichageDonationFinancier->setStatus($search_personne ? true : false);
+                $affichage[] = $affichageDonationFinancier;
+            }
+            if ($affichage) {
                 return $this->json([
                     'success' => true,
-                    'data' => $results,
+                    'data' => $affichage,
                 ]);
             } else {
                 return $this->json([

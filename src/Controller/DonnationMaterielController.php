@@ -8,6 +8,7 @@ use App\Repository\DonnationMaterielRepository;
 use App\Repository\MaterielRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\UsersRepository;
+use App\Service\AffichageDonationMateriel;
 use App\Service\InvestigationMateriel;
 use App\Service\TresorerieService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -63,7 +64,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json($demandeFinancierRepository->findAll(), 200, []);
         }
         #[Route('api/rechercheMateriel',name:'RechercheMateriel',methods:'POST')]
-        public function rechercheDonnation(Request $request, DonnationMaterielRepository $donationMaterielRepository){
+        public function rechercheDonnation(Request $request, DonnationMaterielRepository $donationMaterielRepository , PersonneMembreRepository $personneMembreRepository){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
                 
@@ -72,10 +73,22 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $dateDebut = $data_decode['dateDebut'] ?? null;
             $dateFin = $data_decode['dateFin'] ?? null; 
             $results = $donationMaterielRepository->rechercheMateriel($searchData, $materiel,$dateDebut, $dateFin);
-            if ($results) {
+            for($i = 0 ; $i < count($results) ; $i++){
+                $nom_prenom = explode(' ',$results[$i]['nom_donnateur_materiel']);
+                $prenom = implode(' ', array_slice($nom_prenom, 1));
+                $search_personne = $personneMembreRepository->getPersonneByNomPrenom($nom_prenom[0] , $prenom);
+                $affichageDonationMateriel = new AffichageDonationMateriel();
+                $affichageDonationMateriel->setNomDonnateurMateriel($results[$i]['nom_donnateur_materiel']);
+                $affichageDonationMateriel->setDateAcquisition(new \DateTime($results[$i]['date_acquisition']));
+                $affichageDonationMateriel->setNomMateriel($results[$i]['nom_materiel']);
+                $affichageDonationMateriel->setNombre($results[$i]['nombre']);
+                $affichageDonationMateriel->setStatus($search_personne ? true : false);
+                $affichage[] = $affichageDonationMateriel;
+            }
+            if ($affichage) {
                 return $this->json([
                     'success' => true,
-                    'data' => $results,
+                    'data' => $affichage,
                 ]);
             } else {
                 return $this->json([
