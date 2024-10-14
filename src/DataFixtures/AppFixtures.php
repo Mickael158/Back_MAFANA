@@ -2,15 +2,18 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Apropos;
 use App\Entity\Association;
 use App\Entity\Genre;
 use App\Entity\PersonneMembre;
+use App\Entity\QuiSommeNous;
 use App\Entity\Role;
 use App\Entity\Users;
 use App\Entity\Vallee;
 use App\Entity\Village;
 use App\Repository\GenreRepository;
 use App\Repository\PersonneMembreRepository;
+use App\Repository\ProfessionRepository;
 use App\Repository\RoleRepository;
 use App\Repository\ValleeRepository;
 use App\Repository\VillageRepository;
@@ -20,7 +23,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    public function __construct(private readonly UserPasswordHasherInterface $hasher,private readonly PersonneMembreRepository $personneRepository, private readonly RoleRepository $roleRepository,private readonly VillageRepository $villageRepository,private readonly ValleeRepository $valleRepository,private readonly GenreRepository $genreRepository)
+    public function __construct(private readonly UserPasswordHasherInterface $hasher,private readonly PersonneMembreRepository $personneRepository, private readonly RoleRepository $roleRepository,private readonly VillageRepository $villageRepository,private readonly ValleeRepository $valleRepository,private readonly GenreRepository $genreRepository,private readonly ProfessionRepository $professionRepository)
     {
         
     }
@@ -94,6 +97,22 @@ class AppFixtures extends Fixture
             ->setNatureJuridique('Nature juridique')
             ->setLogo('Logo');
         $manager->persist($association);
+        $manager->flush();
+
+        $Apropos = new Apropos();
+        $Apropos->setMots('Mot de professeur');
+        $manager->persist($Apropos);
+        $manager->flush();
+
+        $profession = $this->professionRepository->findAll();
+        $qui = new QuiSommeNous();
+        $qui
+            ->setDateDebutMondat(new \DateTime())
+            ->setDateFinMondat(new \DateTime())
+            ->setImage('TEST')
+            ->setPersonneId($idPersonne[0])
+            ->setProfessionId($profession[0]);
+        $manager->persist($qui);
         $manager->flush();
     }
 }

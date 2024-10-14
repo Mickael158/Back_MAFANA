@@ -18,9 +18,9 @@ class EvenementRepository extends ServiceEntityRepository
     public function get3_proche_evenement()
     {
         $sql = "select * from evenement where date_evenement >= NOW() and publier = true order BY date_evenement asc limit 4";
-        
+
         $conn = $this->getEntityManager()->getConnection();
-        
+
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();
         
