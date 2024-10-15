@@ -39,7 +39,7 @@ security:
         - { path: ^/api/Valle_Total, roles: PUBLIC_ACCESS }
         - { path: ^/api/Personne_Total, roles: PUBLIC_ACCESS }
         - { path: ^/api/Evenement_Total, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: IS_1AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
