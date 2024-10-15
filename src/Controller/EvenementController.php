@@ -84,11 +84,20 @@ class EvenementController extends AbstractController
 
         #[Route('/api/Evenement',name:'selectAll_Evenement',methods:'GET')]
         public function selectAll(EvenementRepository $EvenementRepository){
-            return $this->json($EvenementRepository->findAll(), 200, []);
+            $nb = count($EvenementRepository->findAll);
+            dd($nb);
+            return $this->json($nb, 200, []);
         }
 
-        #[Route('/api/Evenement/proche_evenement',name:'select3_proche_evenement',methods:'GET')]
+        #[Route('/api/Evenement_proche_evenement',name:'select3_proche_evenement',methods:'GET')]
         public function select3_proche_evenement(EvenementRepository $EvenementRepository){
             return $this->json($EvenementRepository->get3_proche_evenement(), 200, []);
         }
+
+    #[Route('/api/TestaB',name:'TestaB',methods:'GET')]
+    public function TestaB(EvenementRepository $EvenementRepository){
+        return $this->json($EvenementRepository->get3_proche_evenement(), 200, []);
+    }
+
+
 }

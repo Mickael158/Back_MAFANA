@@ -32,11 +32,14 @@ security:
     access_control:
         - { path: ^/api/login, roles: PUBLIC_ACCESS }  
         - { path: ^/api/Associations, roles: PUBLIC_ACCESS }  
-        - { path: ^/api/Evenement/proche_evenement, roles: PUBLIC_ACCESS }
+        - { path: ^/api/TestaB, roles: PUBLIC_ACCESS }
         - { path: ^/api/import, roles: PUBLIC_ACCESS }
         - { path: ^/api/Aproposs, roles: PUBLIC_ACCESS }
         - { path: ^/api/last, roles: PUBLIC_ACCESS }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/Valle_Total, roles: PUBLIC_ACCESS }
+        - { path: ^/api/Personne_Total, roles: PUBLIC_ACCESS }
+        - { path: ^/api/Evenement_Total, roles: PUBLIC_ACCESS }
+        - { path: ^/api, roles: IS_1AUTHENTICATED_FULLY }
 
 when@test:
     security:

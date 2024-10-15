@@ -28,6 +28,7 @@ class ValleeRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+
     //    /**
     //     * @return Vallee[] Returns an array of Vallee objects
     //     */

@@ -31,7 +31,7 @@ class Evenement
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?users $Id_Utilisateur = null;
+    private ?Users $Id_Utilisateur = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]

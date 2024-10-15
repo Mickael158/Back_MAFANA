@@ -38,6 +38,7 @@ class EvenementRepository extends ServiceEntityRepository
         return $resultSet->fetchAllAssociative();
     }
 
+
     //    /**
     //     * @return Evenement[] Returns an array of Evenement objects
     //     */

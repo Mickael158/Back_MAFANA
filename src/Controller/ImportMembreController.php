@@ -20,38 +20,27 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
         #[Route('/api/import/{file}',name:'selectAll_Categorie',methods:'POST')]
         public function selectAll_import($file , ImportMembreRepository $ImportMembreRepository , EntityManagerInterface $em , ValleeRepository $valleeRepository , VillageRepository $villageRepository , GenreRepository $genreRepository){
-            $LastImport = $ImportMembreRepository->findAll();
-            foreach($LastImport as $Last){
-                $em->remove($Last);
-                $em->flush();
-            }
-            $files = 'D:/Mafana/API/CSV/'.$file;
-            $import = $ImportMembreRepository->findAllFromFile($files);
+            $file = `D:/Mafana/API/CSV/`.$file;
+            $import = $ImportMembreRepository->findAllFromFile($file);
             foreach($import as $data_import){
                 $em->persist($data_import);
                 $em->flush();
             }
             $trangobeImport = $ImportMembreRepository->getImportDistinctTrangobe();
             foreach($trangobeImport as $trangobe){
-                $diplucation_vallee = $valleeRepository->getValle_by_nomValle($trangobe['trangobe']);
-                if($diplucation_vallee == null) {
-                    $valle = new Vallee();
-                    $valle->setNomVallee($trangobe['trangobe']);
-                    $em->persist($valle);
-                    $em->flush();
-                }
+                $valle = new Vallee();
+                $valle->setNomVallee($trangobe['trangobe']);
+                $em->persist($valle);
+                $em->flush();
             }
             $fiaviana_antanana = $ImportMembreRepository->getImportDistinctfiaviana_antanana();
             foreach($fiaviana_antanana as $fiaviana){
-                $duplication_village = $villageRepository->getVillage_by_nomVillage($fiaviana['fiaviana_antanana']);
-                if($duplication_village == null){
-                    $valle = $valleeRepository->getValle_by_nomValle($fiaviana['trangobe']);
-                    $village = new Village();
-                    $village->setNomVillage($fiaviana['fiaviana_antanana']);
-                    $village->setIdVallee($valleeRepository->find($valle[0]['id']));
-                    $em->persist($village);
-                    $em->flush();
-                }
+                $valle = $valleeRepository->getValle_by_nomValle($fiaviana['trangobe']);
+                $village = new Village();
+                $village->setNomVillage($fiaviana['fiaviana_antanana']);
+                $village->setIdVallee($valleeRepository->find($valle[0]['id']));
+                $em->persist($village);
+                $em->flush();
             }
             $Allimportation = $ImportMembreRepository->getImportDistinctPeronne();
             foreach($Allimportation as $allImport){
