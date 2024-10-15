@@ -17,7 +17,7 @@ class QuiSommeNousRepository extends ServiceEntityRepository
     }
 
     public function getLast(){
-            $sql = "select id from qui_somme_nous where id = (SELECT MAX(id) FROM qui_somme_nous) AND date_fin_mondat >= NOW()";
+            $sql = "select id from qui_somme_nous where id = (SELECT MAX(id) FROM qui_somme_nous where (NOW() BETWEEN date_debut_mondat AND date_fin_mondat) )";
             $conn = $this->getEntityManager()->getConnection();
             $stmt = $conn->prepare($sql);
             $resultSet = $stmt->executeQuery();
