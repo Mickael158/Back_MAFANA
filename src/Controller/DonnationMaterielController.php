@@ -22,12 +22,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_PAYEMENT")'))]
     class DonnationMaterielController extends AbstractController{
 
-        #[Route('/api/DonnationMateriel',name:'insetion_DonnationMateriel',methods:'POST')]
+        #[Route('/api/DonnationMateriels',name:'insetion_DonnationMateriel',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em , UsersRepository $usersRepository, MaterielRepository $materielrepository,TresorerieService $tresorerieService,JWTEncoderInterface $jWTEncoderInterface){
             $DonnationMateriel = new DonnationMateriel();
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            dd($data_decode['id_materiel_id']);
             $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
             $user = $usersRepository->findOneBy(['username'=>$decode['username']]);
             $materiel = $materielrepository->find($data_decode['id_materiel_id']);

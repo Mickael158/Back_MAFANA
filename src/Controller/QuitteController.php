@@ -32,8 +32,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             }
             return $this->json(['message' => 'Personne Membre Profession inserer'], 200, []);
         }
-        // #[Route('/api/Quitte/{id}',name:'selectAll_Association',methods:'GET')]
-        // public function selectAll(int $id ,QuitteRepository $QuitteRepository){
-        //     return $this->json($QuitteRepository->getProfession_By_personne($id), 200, []);
-        // }
+
+        #[Route('/api/restorer/{id}',name:'selectAll_Association',methods:'GET')]
+        public function restorer(Quitte $quitte ,EntityManagerInterface $em){
+            $em->remove($quitte);
+            $em->flush();
+            return $this->json(['message' => 'Personne restaurer'], 200, []);
+        }
     }

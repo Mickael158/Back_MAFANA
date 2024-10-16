@@ -84,8 +84,7 @@ class EvenementController extends AbstractController
 
         #[Route('/api/Evenement',name:'selectAll_Evenement',methods:'GET')]
         public function selectAll(EvenementRepository $EvenementRepository){
-            $nb = count($EvenementRepository->findAll);
-            dd($nb);
+            $nb = $EvenementRepository->findAll();
             return $this->json($nb, 200, []);
         }
 

@@ -104,15 +104,5 @@ class AppFixtures extends Fixture
         $manager->persist($Apropos);
         $manager->flush();
 
-        $profession = $this->professionRepository->findAll();
-        $qui = new QuiSommeNous();
-        $qui
-            ->setDateDebutMondat(new \DateTime())
-            ->setDateFinMondat(new \DateTime())
-            ->setImage('TEST')
-            ->setPersonneId($idPersonne[0])
-            ->setProfessionId($profession[0]);
-        $manager->persist($qui);
-        $manager->flush();
     }
 }

@@ -222,7 +222,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $demandeFinancierRepository->pourcentage($personneAll[$i]['id']);
+                $pourcentage = $this->pourcentageAA($personneAll[$i]['id'] , $personneMembreRepository ,  $demandeFinancierRepository);
                 $personne = $personneMembreRepository->find($personneAll[$i]['id']);
                 $investigationFinancier->setPersonnMembre($personne);
                 $investigationFinancier->setPourcentage($pourcentage);
@@ -249,11 +249,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json($pourcentage, 200, []);
         }
 
-        public function pourcentageAA(
-            $id, 
-            PersonneMembreRepository $personneMembreRepository,
-            DemandeFinancierRepository $demandeFinancierRepository
-            ) {
+        public function pourcentageAA( $id ,PersonneMembreRepository $personneMembreRepository,DemandeFinancierRepository $demandeFinancierRepository) {
             $personneMembre = $personneMembreRepository->getPersonne_LastCotisation($id);
             $mois_total = $demandeFinancierRepository->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
             $mois_a_payer = $demandeFinancierRepository->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
@@ -263,8 +259,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             if($mois_total == 0){
                 return 0;
             }
-
-            return ($mois_a_payer * 100) / $mois_total;
+            $diff =  $mois_total - $mois_a_payer ;
+            return ($diff * 100) / $mois_total;
         }
 
         #[Route('/api/personneQuitter',name:'personneAll_quitter',methods:'GET')]
