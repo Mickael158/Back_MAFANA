@@ -50,10 +50,4 @@ class PrixCotisationController extends AbstractController
     {
         return $this->json($PrixCotisationRepository->find($id), 200, []);
     }
-    #[Route('/api/laste', name: 'select_laste', methods: ['GET'])]
-    public function laste(PrixCotisationRepository $PrixCotisationRepository)
-    {
-        $date_debut = new \DateTime('2024-01-01');
-        return $this->json($PrixCotisationRepository->getLastPrix_by_Date($date_debut), 200, []);
-    }
 }

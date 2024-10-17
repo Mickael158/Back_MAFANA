@@ -7,6 +7,7 @@ use App\Entity\Vallee;
 use App\Entity\Village;
 use App\Repository\GenreRepository;
 use App\Repository\ImportMembreRepository;
+use App\Repository\PersonneMembreRepository;
 use App\Repository\ValleeRepository;
 use App\Repository\VillageRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -19,43 +20,56 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
     class ImportMembreController extends AbstractController{
 
         #[Route('/api/import/{file}',name:'selectAll_Categorie',methods:'POST')]
-        public function selectAll_import($file , ImportMembreRepository $ImportMembreRepository , EntityManagerInterface $em , ValleeRepository $valleeRepository , VillageRepository $villageRepository , GenreRepository $genreRepository){
-            $file = `D:/Mafana/API/CSV/`.$file;
-            $import = $ImportMembreRepository->findAllFromFile($file);
+        public function selectAll_import($file , ImportMembreRepository $ImportMembreRepository , EntityManagerInterface $em , ValleeRepository $valleeRepository , VillageRepository $villageRepository , GenreRepository $genreRepository , PersonneMembreRepository $personneMembreRepository){
+            $files = "D:/Mafana/API/CSV/".$file;
+            $importAll = $ImportMembreRepository->findAll();
+            foreach($importAll as $importall){
+                $em->remove($importall);
+                $em->flush();
+            }
+            $import = $ImportMembreRepository->findAllFromFile($files);
             foreach($import as $data_import){
                 $em->persist($data_import);
                 $em->flush();
             }
             $trangobeImport = $ImportMembreRepository->getImportDistinctTrangobe();
             foreach($trangobeImport as $trangobe){
-                $valle = new Vallee();
-                $valle->setNomVallee($trangobe['trangobe']);
-                $em->persist($valle);
-                $em->flush();
+                $valleExciste = $valleeRepository->getValle_by_nomValle($trangobe['trangobe']);
+                if(!$valleExciste){
+                    $valle = new Vallee();
+                    $valle->setNomVallee($trangobe['trangobe']);
+                    $em->persist($valle);
+                    $em->flush();
+                }
             }
             $fiaviana_antanana = $ImportMembreRepository->getImportDistinctfiaviana_antanana();
             foreach($fiaviana_antanana as $fiaviana){
-                $valle = $valleeRepository->getValle_by_nomValle($fiaviana['trangobe']);
-                $village = new Village();
-                $village->setNomVillage($fiaviana['fiaviana_antanana']);
-                $village->setIdVallee($valleeRepository->find($valle[0]['id']));
-                $em->persist($village);
-                $em->flush();
+                $villageExciste = $villageRepository->getVillage_by_nomVillage($fiaviana['fiaviana_antanana']);
+                if(!$villageExciste){
+                    $village = new Village();
+                    $village->setNomVillage($fiaviana['fiaviana_antanana']);
+                    $village->setIdVallee($valleeRepository->find($valleeRepository->getValle_by_nomValle($fiaviana['trangobe'])[0]['id']));
+                    $em->persist($village);
+                    $em->flush();
+                }
             }
             $Allimportation = $ImportMembreRepository->getImportDistinctPeronne();
             foreach($Allimportation as $allImport){
-                $personne = new PersonneMembre();
-                $personne->setNomMembre($allImport['anarana']);
-                $personne->setPrenomMembre($allImport['fanampiny']);
-                $personne->setDateDeNaissance(new \DateTime($allImport['daty_naterahana']));
-                $personne->setAddress($allImport['adiresy_eto_antananarivo']);
-                $personne->setEmail($allImport['mailaka']);
-                $personne->setTelephone($allImport['laharana_finday']);
-                $personne->setIdVillage($villageRepository->find($villageRepository->getVillage_by_nomVillage($allImport['fiaviana_antanana'])['id']));
-                $personne->setIdGenre($genreRepository->find($genreRepository->getGenre_by_non($allImport['lahy_na_vavy'])['id']));
-                $personne->setDateInscription(new \DateTime());
-                $em->persist($personne);
-                $em->flush();
+                $result = $personneMembreRepository->getPersonneByNomPrenomEmail($allImport['anarana'],$allImport['fanampiny'] , $allImport['mailaka']);
+                if(!$result){
+                    $personne = new PersonneMembre();
+                    $personne->setNomMembre($allImport['anarana']);
+                    $personne->setPrenomMembre($allImport['fanampiny']);
+                    $personne->setDateDeNaissance(new \DateTime($allImport['daty_naterahana']));
+                    $personne->setAddress($allImport['adiresy_eto_antananarivo']);
+                    $personne->setEmail($allImport['mailaka']);
+                    $personne->setTelephone($allImport['laharana_finday']);
+                    $personne->setIdVillage($villageRepository->find($villageRepository->getVillage_by_nomVillage($allImport['fiaviana_antanana'])['id']));
+                    $personne->setIdGenre($genreRepository->find($genreRepository->getGenre_by_non($allImport['lahy_na_vavy'])['id']));
+                    $personne->setDateInscription(new \DateTime());
+                    $em->persist($personne);
+                    $em->flush();
+                }
             }
             return $this->json(['message' => 'Import'], 200, []);
         }

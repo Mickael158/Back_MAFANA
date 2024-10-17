@@ -24,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function inerer(Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository,PersonneMembreRepository $personneMembreRepository){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $result = $personneMembreRepository->getPersonneByNomAndPrenom($data_decode['Nom'],$data_decode['Prenom']);
+            $result = $personneMembreRepository->getPersonneByNomPrenomEmail($data_decode['Nom'],$data_decode['Prenom'] , $data_decode['Email']);
             if($result){
                 return $this->json(['error'=>'Cette personne est dejas ennregistrer!'],200,[]);
             }else{

@@ -39,11 +39,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Demande Materiel inserer'], 200, []);
         }
         
-        #[Route('/api/aaa',name:'aaa',methods:'GET')]
-        public function aaa(DemandeFinancierRepository $demandeFinancierRepository){
-            
-            return $this->json($demandeFinancierRepository->differenceEnMois("2024-10-19" , new \DateTime()), 200, []);
-        }
 
         #[Route('/api/stock/{id}',name:'stock',methods:'GET')]
         public function stock($id,MaterielRepository $materielRepository,DemandeMaterielRepository $demandeMaterielRepository){

@@ -39,10 +39,4 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectById($id,PrixChargeRepository $PrixChargeRepository){
             return $this->json($PrixChargeRepository->find($id), 200, []);
         }
-        #[Route('/api/selectPrixLastByDateByIdCharge',name:'selectId_PrixCharge',methods:'GET')]
-        public function selectPrixLastByDateByIdCharge(PrixChargeRepository $PrixChargeRepository){
-            $date = new \DateTime();
-            $idCharge = 1;
-            return $this->json($PrixChargeRepository->getLastPrix_by_Date_by_idCharge($date , $idCharge));
-        }
     }

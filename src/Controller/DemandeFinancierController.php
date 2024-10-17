@@ -32,10 +32,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $tresorerieService->insert($DemandeFinancier->getMontant());
             return $this->json(['message' => 'DemandeFinancier inserer'], 200, []);
         }
-        #[Route('/api/teste',name:'selectAll_Charge',methods:'GET')]
-        public function selectAll(DemandeFinancierRepository $demandeFinancierRepository){
-            return $this->json($demandeFinancierRepository->calculatePercentage(0), 200, []);
-        }
         #[Route('api/rechercheDemandeFinancier', name:'RechercheDemandeFinancier', methods:'POST')]
         public function rechercheDemandeFinancier(Request $request, DemandeFinancierRepository $demandeFinancierRepository, PersonneMembreRepository $personneMembreRepository)
         {
