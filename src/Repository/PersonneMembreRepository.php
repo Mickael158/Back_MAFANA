@@ -398,24 +398,11 @@ class PersonneMembreRepository extends ServiceEntityRepository
 
     public function recherchePersonneAll($data, $village, $genre, $profession){
         $sql = "SELECT pm.*
-            FROM personne_membre pm
-            JOIN Village v ON v.id = pm.id_village_id
-            JOIN Genre g ON g.id = pm.id_genre_id
-            LEFT JOIN (
-                SELECT id_personne_membre_id, MAX(date) AS last_quit_date
-                FROM Quitte
-                GROUP BY id_personne_membre_id
-            ) q ON pm.id = q.id_personne_membre_id
-            LEFT JOIN (
-                SELECT id_personne_membre_id, MAX(date_restauration) AS last_restauration_date
-                FROM restauration_membre
-                GROUP BY id_personne_membre_id
-            ) r ON pm.id = r.id_personne_membre_id
-            LEFT JOIN personne_membre_profession pmp ON pmp.id_personne_membre_id = pm.id
-            WHERE (
-                q.last_quit_date IS NULL 
-                OR (r.last_restauration_date IS NOT NULL AND r.last_restauration_date >= q.last_quit_date)
-        )";
+                    FROM personne_membre pm
+                    JOIN Village v ON v.id = pm.id_village_id
+                    JOIN Genre g ON g.id = pm.id_genre_id
+                    LEFT JOIN Quitte q ON q.id_personne_membre_id = pm.id
+                    WHERE q.id_personne_membre_id IS NULL";
         if($data !== null){
             $sql.= " AND (pm.nom_membre = '".$data."' OR pm.prenom_membre = '".$data."' OR pm.telephone = '".$data."' OR pm.email='".$data."')";
         }
@@ -442,12 +429,8 @@ class PersonneMembreRepository extends ServiceEntityRepository
         $sql = "SELECT pm.* 
             FROM Personne_membre pm
             JOIN quitte q ON pm.id = q.id_personne_membre_id
-            LEFT JOIN restauration_membre rm ON rm.id_personne_membre_id = pm.id
-            WHERE q.date > COALESCE((
-                SELECT MAX(rm2.date_restauration)
-                FROM restauration_membre rm2
-                WHERE rm2.id_personne_membre_id = pm.id
-            ), '1900-01-01')";
+            WHERE q.id_personne_membre_id = pm.id
+            ";
         $conn = $this->getEntityManager()->getConnection();
         $stmt = $conn->prepare($sql);
         $resultSet = $stmt->executeQuery();

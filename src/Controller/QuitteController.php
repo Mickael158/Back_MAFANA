@@ -1,13 +1,9 @@
 <?php
     namespace App\Controller;
 
-use App\Entity\PersonneMembre;
 use App\Entity\Quitte;
-use App\Entity\Profession;
 use App\Repository\QuitteRepository;
 use App\Repository\PersonneMembreRepository;
-use App\Repository\ProfessionRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
@@ -33,9 +29,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Personne Membre Profession inserer'], 200, []);
         }
 
-        #[Route('/api/restorer/{id}',name:'selectAll_Association',methods:'GET')]
-        public function restorer(Quitte $quitte ,EntityManagerInterface $em){
-            $em->remove($quitte);
+        #[Route('/api/restorer/{id}',name:'selectAll_Association',methods:'POST')]
+        public function restorer($id,QuitteRepository $quitteRepository,PersonneMembreRepository $personneMembreRepository ,EntityManagerInterface $em){
+            $personne = $personneMembreRepository->find($id);
+            $quitte = $quitteRepository->findBy(['id_personne_membre'=>$personne]);
+            $em->remove($quitte[0]);
             $em->flush();
             return $this->json(['message' => 'Personne restaurer'], 200, []);
         }

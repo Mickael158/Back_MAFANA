@@ -33,7 +33,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $DonnationMateriel->setNomDonnateurMateriel($data_decode['nom_donnateur_materiel']);
             $DonnationMateriel->setDateAcquisition(new \DateTime());
             $DonnationMateriel->setNombre($data_decode['nombre']);
-            $DonnationMateriel->setImage($data_decode['image']);
+            $DonnationMateriel->setImage('AAA');
             $DonnationMateriel->setIdMateriel($materiel);
             $DonnationMateriel->setIdUtilisateurId($user);
             $em->persist($DonnationMateriel);
