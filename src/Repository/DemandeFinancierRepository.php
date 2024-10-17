@@ -46,6 +46,34 @@ class DemandeFinancierRepository extends ServiceEntityRepository
         $pourcentage = ($diffpayer * 100) / $diff100;
         return $pourcentage;
     }
+    public function rechercheDemandeFinancier($data, $montant, $dateDebut, $dateFin)
+    {
+        $sql = "SELECT dm.*, vdm.*, pm.* 
+                FROM demande_financier dm
+                JOIN validation_demande_financier vdm ON dm.id = vdm.id_demande_financier_id
+                JOIN personne_membre pm ON pm.id = dm.id_personne_membre_id 
+                WHERE 1=1";
+
+        if ($data !== null) {
+            $sql .= " AND (pm.nom_membre = '".$data."' OR pm.prenom_membre = '".$data."')";
+        }
+        if ($montant !== null) {
+            $sql .= " AND dm.montant > ".$montant;
+        }
+        if ($dateDebut !== null && $dateFin !== null) {
+            $sql .= " AND dm.date_demande_financier BETWEEN '".$dateDebut."' AND '".$dateFin."'";
+        }
+        if ($data == null && $montant == null && $dateDebut == null && $dateFin == null) {
+            $sql .= " LIMIT 10";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
     // public function pourcentage1($id) {
     //     // Récupérer les informations de la personne membre
     //     $personneMembre = $this->personneMembreRepository->getPersonne_LastCotisation($id);
