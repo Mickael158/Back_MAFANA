@@ -44,6 +44,35 @@ class DemandeMaterielRepository extends ServiceEntityRepository
         
         return $resultSet->fetchAllAssociative();
     }
+    public function rechercheDemandeMateriel($data, $materielId, $dateDebut, $dateFin)
+    {
+        $sql = "SELECT dm.*, vdm.*, pm.* , m.*
+                FROM demande_materiel dm
+                JOIN validation_demande_materiel vdm ON dm.id = vdm.id_demande_materiel_id
+                JOIN materiel m ON m.id=id_materiel_id
+                JOIN personne_membre pm ON pm.id = dm.id_personne_membre_id 
+                WHERE 1=1";
+
+        if ($data !== null) {
+            $sql .= " AND (pm.nom_membre = '".$data."' OR pm.prenom_membre = '".$data."')";
+        }
+        if ($materielId !== null) {
+            $sql .= " AND dm.id_materiel_id = ".$materielId;
+        }
+        if ($dateDebut !== null && $dateFin !== null) {
+            $sql .= " AND dm.date_de_demande BETWEEN '".$dateDebut."' AND '".$dateFin."'";
+        }
+        if ($data == null && $materielId == null && $dateDebut == null && $dateFin == null) {
+            $sql .= " LIMIT 10";
+        }
+
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
 
     //    /**
     //     * @return DemandeMateriel[] Returns an array of DemandeMateriel objects

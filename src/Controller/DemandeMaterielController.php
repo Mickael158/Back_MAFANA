@@ -56,5 +56,31 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             
             return $this->json($stockService, 200, []);
         }
+        #[Route('/api/rechercheDemandeMateriels', name:'RechercheMateriels', methods:'POST')]
+        public function rechercheDemandeMateriels(Request $request, DemandeMaterielRepository $demandeMaterielRepository)
+        {
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+
+            $searchData = $data_decode['data'] ?? null;
+            $materielId = $data_decode['materielId'] ?? null;
+            $dateDebut = $data_decode['dateDebut'] ?? null;
+            $dateFin = $data_decode['dateFin'] ?? null;
+            
+            $results = $demandeMaterielRepository->rechercheDemandeMateriel($searchData, $materielId, $dateDebut, $dateFin);
+           
+            if (!empty($results)) {
+                return $this->json([
+                    'success' => true,
+                    'data' => $results,
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+                ]);
+            }
+        }
+
         
     }

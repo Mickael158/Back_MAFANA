@@ -16,49 +16,47 @@ class DonationFinancierRepository extends ServiceEntityRepository
         parent::__construct($registry, DonationFinancier::class);
     }
     public function getStatDonnation()
-{
-    $sql = "SELECT 
-    DATE_TRUNC('month', date_donation_financier) AS mois,
-    SUM(montant) AS total_montant
-FROM 
-    donation_financier
-WHERE 
-    date_donation_financier >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6 months'
-GROUP BY 
-    DATE_TRUNC('month', date_donation_financier)
-ORDER BY 
-    mois;
-";
-    
-    $conn = $this->getEntityManager()->getConnection();
-    
-    $stmt = $conn->prepare($sql);
-    $resultSet = $stmt->executeQuery();
-    
-    return $resultSet->fetchAllAssociative();
-}
-
-public function rechercheDonation($data, $dataeDebut, $dataeFin)
-{
-    $sql = "SELECT * FROM donation_financier WHERE 1=1"; 
-
-    if ($data !== null) {
-        $sql .= " AND nom_donation_financier = '" . $data . "'";
-    }
-    if ($dataeDebut !== null && $dataeFin !== null) {
-        $sql .= " AND date_donation_financier BETWEEN '" . $dataeDebut . "' AND '" . $dataeFin . "'";
-    }
-    if ($data == null && $dataeDebut == null && $dataeFin == null) {
-        $sql .= " LIMIT 10";
+    {
+        $sql = "SELECT 
+                    DATE_TRUNC('month', date_donation_financier) AS mois,
+                    SUM(montant) AS total_montant
+                FROM 
+                    donation_financier
+                WHERE 
+                    date_donation_financier >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '6 months'
+                GROUP BY 
+                    DATE_TRUNC('month', date_donation_financier)
+                ORDER BY 
+                    mois;
+            ";
+        
+        $conn = $this->getEntityManager()->getConnection();
+        
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
     }
 
-    $conn = $this->getEntityManager()->getConnection();
-    $stmt = $conn->query($sql);
+    public function rechercheDonation($data, $dataeDebut, $dataeFin)
+    {
+        $sql = "SELECT * FROM donation_financier WHERE 1=1"; 
 
-    return $stmt->fetchAllAssociative();
-}
+        if ($data !== null) {
+            $sql .= " AND nom_donation_financier = '" . $data . "'";
+        }
+        if ($dataeDebut !== null && $dataeFin !== null) {
+            $sql .= " AND date_donation_financier BETWEEN '" . $dataeDebut . "' AND '" . $dataeFin . "'";
+        }
+        if ($data == null && $dataeDebut == null && $dataeFin == null) {
+            $sql .= " LIMIT 10";
+        }
 
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->query($sql);
 
+        return $stmt->fetchAllAssociative();
+    }
     //    /**
     //     * @return DonationFinancier[] Returns an array of DonationFinancier objects
     //     */

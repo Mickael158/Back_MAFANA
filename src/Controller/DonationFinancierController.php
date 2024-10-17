@@ -5,6 +5,7 @@ use App\Entity\DonationFinancier;
 use App\Entity\DonnationMateriel;
 use App\Entity\PersonneMembre;
 use App\Repository\DemandeFinancierRepository;
+use App\Repository\DemandeMaterielRepository;
 use App\Repository\DonationFinancierRepository;
 use App\Repository\DonnationMaterielRepository;
 use App\Repository\PersonneMembreRepository;
@@ -101,5 +102,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ]);
             }
         }
+        
+
         
 }

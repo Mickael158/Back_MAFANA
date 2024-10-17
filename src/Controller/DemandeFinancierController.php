@@ -36,4 +36,30 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         public function selectAll(DemandeFinancierRepository $demandeFinancierRepository){
             return $this->json($demandeFinancierRepository->calculatePercentage(0), 200, []);
         }
+        #[Route('api/rechercheDemandeFinancier', name:'RechercheDemandeFinancier', methods:'POST')]
+        public function rechercheDemandeFinancier(Request $request, DemandeFinancierRepository $demandeFinancierRepository, PersonneMembreRepository $personneMembreRepository)
+        {
+            $data = $request->getContent();
+            $data_decode = json_decode($data, true);
+
+            $searchData = $data_decode['data'] ?? null; 
+            $montant = $data_decode['montant'] ?? null; 
+            $dateDebut = $data_decode['dateDebut'] ?? null;
+            $dateFin = $data_decode['dateFin'] ?? null; 
+
+            $results = $demandeFinancierRepository->rechercheDemandeFinancier($searchData, $montant, $dateDebut, $dateFin);
+            
+            if (!empty($results)) {
+                return $this->json([
+                    'success' => true,
+                    'data' => $results,
+                ]);
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Aucun résultat trouvé pour les critères spécifiés.',
+                ]);
+            }
+        }
+
     }
