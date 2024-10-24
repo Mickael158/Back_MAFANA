@@ -260,7 +260,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 return 0;
             }
             $diff =  $mois_total - $mois_a_payer ;
-            return ($diff * 100) / $mois_total;
+            $resultat =($diff * 100) / $mois_total;
+            if($resultat > 100){
+                return 100;
+            }else{
+                return $resultat;
+            }
         }
 
         #[Route('/api/personneQuitter',name:'personneAll_quitter',methods:'GET')]

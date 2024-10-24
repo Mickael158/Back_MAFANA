@@ -35,16 +35,16 @@ class DemandeFinancierRepository extends ServiceEntityRepository
     
     public function pourcentage($id) {
         $personneMembre = $this->personneMembreRepository->getPersonne_LastCotisation($id);
-        $diff100 = $this->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
-        $diffpayer = $this->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
-        if( $diffpayer < 0){
-            $diffpayer =  1;
+        $mois_total = $this->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
+        $mois_a_payer = $this->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
+        if($personneMembre['date_inscription'] == $personneMembre['dernier_payement']) {
+            $mois_a_payer = 0;
         }
-        if($diff100 == 0){
-            $diff100 = 1;
+        if($mois_total == 0){
+            return 0;
         }
-        $pourcentage = ($diffpayer * 100) / $diff100;
-        return $pourcentage;
+        $diff =  $mois_total - $mois_a_payer ;
+        return ($diff * 100) / $mois_total;
     }
     public function rechercheDemandeFinancier($data, $montant, $dateDebut, $dateFin)
     {
