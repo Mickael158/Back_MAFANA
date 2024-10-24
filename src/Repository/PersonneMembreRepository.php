@@ -387,6 +387,26 @@ class PersonneMembreRepository extends ServiceEntityRepository
         
         return $resultSet->fetchAllAssociative();
     }
+    public function getPersonneByNomPrenoms($nom , $prenom)
+    {
+        $sql = "SELECT * FROM personne_membre WHERE nom_membre = '".$nom."' AND prenom_membre = '".$prenom."'";
+        
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
+    public function getPersonneByEmail($email)
+    {
+        $sql = "SELECT * FROM personne_membre WHERE email = '".$email."'";
+        
+        $conn = $this->getEntityManager()->getConnection();
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery();
+        
+        return $resultSet->fetchAllAssociative();
+    }
 
     public function PersonneCharge_ByResposanble(int $id_personne): array
     {
