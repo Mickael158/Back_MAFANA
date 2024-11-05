@@ -45,13 +45,13 @@ class AppFixtures extends Fixture
         $manager->flush();
 
         $valle = new Vallee();
-        $valle->setNomVallee('ANTANANARIVO');
+        $valle->setNomVallee('MANAGNANO');
         $manager->persist($valle);
         $manager->flush();
 
         $idValle = $this->valleRepository->findAll();
         $village = new Village();
-        $village->setNomVillage('67Ha')
+        $village->setNomVillage('managnano1')
         ->setIdVallee($idValle[0]);
         $manager->persist($village);
         $manager->flush();

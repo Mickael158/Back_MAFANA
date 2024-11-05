@@ -22,29 +22,29 @@ class DemandeFinancierRepository extends ServiceEntityRepository
         $dateDebut = new DateTime($dateDebut);
         $dateFin = $dateFin;
     
-        // Extraire les années et les mois
         $anneeDebut = (int) $dateDebut->format('Y');
         $moisDebut = (int) $dateDebut->format('m');
         $anneeFin = (int) $dateFin->format('Y');
         $moisFin = (int) $dateFin->format('m');
-        // Calculer la différence totale en mois
-        $diffMois = ($anneeFin - $anneeDebut) * 12 + ($moisFin - $moisDebut);
-    
-        return $diffMois;
+        $diffMoisAvant = 12 - $moisDebut;
+        $diffMoisAnnee = (($anneeFin) - ($anneeDebut+1) ) * 12 ;
+        return $diffMoisAvant + $diffMoisAnnee + $moisFin;
+        // return $anneeFin - 1;
     }
     
-    public function pourcentage($id) {
-        $personneMembre = $this->personneMembreRepository->getPersonne_LastCotisation($id);
-        $mois_total = $this->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
-        $mois_a_payer = $this->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
-        if($personneMembre['date_inscription'] == $personneMembre['dernier_payement']) {
-            $mois_a_payer = 0;
-        }
+    public function pourcentage($id , PersonneMembreRepository $personneMembreRepository,DemandeFinancierRepository $demandeFinancierRepository) {
+        $personneMembre = $personneMembreRepository->getPersonne_LastCotisation($id);
+        $mois_total = $demandeFinancierRepository->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
+        $mois_a_payer = $demandeFinancierRepository->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
         if($mois_total == 0){
             return 0;
         }
         $diff =  $mois_total - $mois_a_payer ;
-        return ($diff * 100) / $mois_total;
+        $resultat =($diff * 100) / $mois_total;
+        if($resultat > 100){
+            $resultat = 100;
+        }
+        return $resultat;
     }
     public function rechercheDemandeFinancier($data, $montant, $dateDebut, $dateFin)
     {

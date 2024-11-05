@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241015090614 extends AbstractMigration
+final class Version20241024134306 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,6 +20,7 @@ final class Version20241015090614 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        $this->addSql('CREATE SEQUENCE apropos_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE association_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE categorie_materiel_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE charge_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
@@ -59,6 +60,7 @@ final class Version20241015090614 extends AbstractMigration
         $this->addSql('CREATE SEQUENCE vallee_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE versement_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
         $this->addSql('CREATE SEQUENCE village_id_seq INCREMENT BY 1 MINVALUE 1 START 1');
+        $this->addSql('CREATE TABLE apropos (id INT NOT NULL, mots VARCHAR(255) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE association (id INT NOT NULL, nom VARCHAR(200) NOT NULL, siege VARCHAR(200) NOT NULL, date_creation DATE NOT NULL, description VARCHAR(500) NOT NULL, email VARCHAR(500) DEFAULT NULL, telephone VARCHAR(16) DEFAULT NULL, secteur_activite VARCHAR(500) NOT NULL, nature_juridique VARCHAR(500) NOT NULL, slogan VARCHAR(500) DEFAULT NULL, logo VARCHAR(500) DEFAULT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE categorie_materiel (id INT NOT NULL, nom_categorie VARCHAR(500) NOT NULL, PRIMARY KEY(id))');
         $this->addSql('CREATE TABLE charge (id INT NOT NULL, nom_charge VARCHAR(100) NOT NULL, PRIMARY KEY(id))');
@@ -193,6 +195,7 @@ final class Version20241015090614 extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE SCHEMA public');
+        $this->addSql('DROP SEQUENCE apropos_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE association_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE categorie_materiel_id_seq CASCADE');
         $this->addSql('DROP SEQUENCE charge_id_seq CASCADE');
@@ -276,6 +279,7 @@ final class Version20241015090614 extends AbstractMigration
         $this->addSql('ALTER TABLE versement DROP CONSTRAINT FK_716E9367C6EE5C49');
         $this->addSql('ALTER TABLE versement DROP CONSTRAINT FK_716E93671400135D');
         $this->addSql('ALTER TABLE village DROP CONSTRAINT FK_4E6C7FAAECEB86D');
+        $this->addSql('DROP TABLE apropos');
         $this->addSql('DROP TABLE association');
         $this->addSql('DROP TABLE categorie_materiel');
         $this->addSql('DROP TABLE charge');

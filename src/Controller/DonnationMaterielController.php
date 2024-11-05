@@ -3,6 +3,7 @@
 
 use App\Entity\DonnationMateriel;
 use App\Entity\Materiel;
+use App\Repository\DemandeFinancierRepository;
 use App\Repository\DemandeMaterielRepository;
 use App\Repository\DonnationMaterielRepository;
 use App\Repository\MaterielRepository;
@@ -41,12 +42,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             return $this->json(['message' => 'Donnation Materiel inserer'], 200, []);
         }
         #[Route('/api/selectDemandeMateriel',name:'select_DemandeMateriel',methods:'GET')]
-        public function selectAll_DemandeFinacier(DemandeMaterielRepository $demandeMaterielRepository , InvestigationMateriel $investigationMateriel , PersonneMembreRepository $personneMembreRepository){
+        public function selectAll_DemandeFinacier(DemandeMaterielRepository $demandeMaterielRepository , InvestigationMateriel $investigationMateriel , PersonneMembreRepository $personneMembreRepository ,DemandeFinancierRepository $demandeFinancierRepository){
             $demande_initial = $demandeMaterielRepository->getDemanceMateriel_With_Investi();
             $demande_final = [];
             for($i = 0 ; $i<count($demande_initial) ; $i++){
                 $investigationMateriel = new InvestigationMateriel();
-                $pourcentage = $demandeMaterielRepository->pourcentage($demande_initial[$i]['id_personne_membre_id']);
+                $pourcentage = $demandeMaterielRepository->pourcentage($demande_initial[$i]['id_personne_membre_id'] , $personneMembreRepository , $demandeFinancierRepository);
                 $demande = $demandeMaterielRepository->find($demande_initial[$i]['id']);
                 $personne = $personneMembreRepository->find($demande_initial[$i]['id_personne_membre_id']);
                 $investigationMateriel->setPersonnMembre($personne);

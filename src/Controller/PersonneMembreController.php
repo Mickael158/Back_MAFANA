@@ -226,6 +226,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $personnefin = [];
             for($i = 0 ; $i<count($personneAll) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
+
                 $pourcentage = $this->pourcentageAA($personneAll[$i]['id'] , $personneMembreRepository ,  $demandeFinancierRepository);
                 $personne = $personneMembreRepository->find($personneAll[$i]['id']);
                 $investigationFinancier->setPersonnMembre($personne);
@@ -234,42 +235,19 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             }
             return $this->json($personnefin, 200, []);
         }
-        #[Route('/api/pourcentage',name:'pourcentage',methods:'GET')]
-        public function pourcentage(DemandeFinancierRepository $demandeFinancierRepository, InvestigationFinancier $investigationFinancier , DemandeFinancierRepository $de , PersonneMembreRepository $personneMembreRepository){
-            $personneMembre = $personneMembreRepository->getPersonne_LastCotisation(2);
-            $diff100 = $de->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
-            $diffpayer = $de->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
-            if( $diffpayer < 0){
-                $diffpayer =  1;
-            }
-            if($diff100 == 0){
-                $diff100 = 1;
-            }
-            $pourcentage = ($diffpayer * 100) / $diff100;
-            if($diff100 == $diffpayer){
-                $pourcentage = 0;
-            }
-            
-            return $this->json($pourcentage, 200, []);
-        }
-
-        public function pourcentageAA( $id ,PersonneMembreRepository $personneMembreRepository,DemandeFinancierRepository $demandeFinancierRepository) {
+        public function pourcentageAA($id , PersonneMembreRepository $personneMembreRepository,DemandeFinancierRepository $demandeFinancierRepository) {
             $personneMembre = $personneMembreRepository->getPersonne_LastCotisation($id);
             $mois_total = $demandeFinancierRepository->differenceEnMois($personneMembre['date_inscription'] , new \DateTime());
             $mois_a_payer = $demandeFinancierRepository->differenceEnMois($personneMembre['dernier_payement'] , new \DateTime());
-            if($personneMembre['date_inscription'] == $personneMembre['dernier_payement']) {
-                $mois_a_payer = 0;
-            }
             if($mois_total == 0){
                 return 0;
             }
             $diff =  $mois_total - $mois_a_payer ;
             $resultat =($diff * 100) / $mois_total;
             if($resultat > 100){
-                return 100;
-            }else{
-                return $resultat;
+                $resultat = 100;
             }
+            return $resultat;
         }
 
         #[Route('/api/personneQuitter',name:'personneAll_quitter',methods:'GET')]

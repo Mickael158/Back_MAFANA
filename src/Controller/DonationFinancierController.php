@@ -53,7 +53,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
             $demande_final = [];
             for($i = 0 ; $i<count($demande_initial) ; $i++){
                 $investigationFinancier = new InvestigationFinancier();
-                $pourcentage = $demandeFinancierRepository->pourcentage($demande_initial[$i]['id_personne_membre_id']);
+                $pourcentage = $demandeFinancierRepository->pourcentage($demande_initial[$i]['id_personne_membre_id'] , $personneMembreRepository , $demandeFinancierRepository);
                 $demande = $demandeFinancierRepository->find($demande_initial[$i]['id']);
                 $personne = $personneMembreRepository->find($demande_initial[$i]['id_personne_membre_id']);
                 $investigationFinancier->setPersonnMembre($personne);
@@ -64,6 +64,16 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 $demande_final[] = $investigationFinancier;
             }
             return $this->json($demande_final, 200, []);
+        }
+        #[Route('/api/CountDemande',name:'CountDemande',methods:'GET')]
+        public function CountDemande(DemandeFinancierRepository $demandeFinancierRepository ,DemandeMaterielRepository $demandeMaterielRepository ){
+            $count = 0;
+            $demande_initialFinancier = $demandeFinancierRepository->getDemanceFinancier_With_Investi();
+            $count_Financier = count($demande_initialFinancier);
+            $demande_initialMateriel = $demandeMaterielRepository->getDemanceMateriel_With_Investi();
+            $count_Materiel = count($demande_initialMateriel);
+            $count = $count_Financier + $count_Materiel;
+            return $this->json($count, 200, []);
         }
         #[Route('/api/SelectAllDonnationFinancier',name:'SelectAllDonnationFinancier',methods:'GET')]
         public function selectAll(DonationFinancierRepository $donationFinancierRepository){

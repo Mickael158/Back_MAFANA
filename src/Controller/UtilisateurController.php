@@ -29,7 +29,7 @@ class UtilisateurController extends AbstractController
     {
         
     }
-    #[Route('/api/Utilisateur',name:'insetion_Utilisateur',methods:'POST')]
+    #[Route('/api/Utilisateurs',name:'insetion_Utilisateur',methods:'POST')]
         public function inerer(Request $request, EntityManagerInterface $em,RoleRepository $roleRepository , PersonneMembreRepository $personneMembreRepository){
             $Utilisateur = new Users();
             $data = $request->getContent();
