@@ -30,6 +30,7 @@ class PersonneMembreProfessionRepository extends ServiceEntityRepository
         
         return $resultSet->fetchAllAssociative();
     }
+    
 
     //    /**
     //     * @return PersonneMembreProfession[] Returns an array of PersonneMembreProfession objects

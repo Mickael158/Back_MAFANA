@@ -31,6 +31,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
         }
         #[Route('/api/PersonneMembreProfessions/{id}',name:'selectAll_Associations',methods:'GET')]
         public function selectAlls(int $id , PersonneMembreProfessionRepository $personneMembreProfessionRepository){
-            return $this->json($personneMembreProfessionRepository->getProfession_By_personne($id), 200, []);
+            return $this->json($personneMembreProfessionRepository->getProfessionNot_By_personne($id), 200, []);
         }
     }
