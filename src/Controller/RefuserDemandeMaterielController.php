@@ -19,7 +19,6 @@ use Symfony\Component\Routing\Attribute\Route;
             $RefuserDemandeMateriel = new RefuserDemandeMateriel();
                 $data = $request->getContent();
                 $data_decode = json_decode($data, true);
-                dd($data_decode);
                 $demande = $demandeMaterielRepository->find($data_decode['id_demande_materiel_id']);
                 $decode = $jWTEncoderInterface->decode($data_decode['utilisateur']);
                 $utilisateur = $usersRepository->findOneBy(['username'=>$decode['username']]);

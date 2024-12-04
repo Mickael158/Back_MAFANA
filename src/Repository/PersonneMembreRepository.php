@@ -437,10 +437,11 @@ class PersonneMembreRepository extends ServiceEntityRepository
     }
 
     public function recherchePersonneAll($data, $village, $genre, $profession){
-        $sql = "SELECT pm.*
+        $sql = "SELECT DISTINCT pm.*
             FROM personne_membre pm
             JOIN Village v ON v.id = pm.id_village_id
             JOIN Genre g ON g.id = pm.id_genre_id
+            LEFT JOIN decede d on d.id_personne_membre_id=pm.id
             LEFT JOIN (
                 SELECT id_personne_membre_id, MAX(date) AS last_quit_date
                 FROM Quitte
@@ -455,7 +456,9 @@ class PersonneMembreRepository extends ServiceEntityRepository
             WHERE (
                 q.last_quit_date IS NULL 
                 OR (r.last_restauration_date IS NOT NULL AND r.last_restauration_date >= q.last_quit_date)
-        )";
+        
+        )
+            AND d.id_personne_membre_id IS NULL";
         if($data !== null){
             $sql.= " AND (pm.nom_membre = '".$data."' OR pm.prenom_membre = '".$data."' OR pm.telephone = '".$data."' OR pm.email='".$data."')";
         }

@@ -21,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
         #[Route('/api/import/{file}',name:'selectAll_Categorie',methods:'POST')]
         public function selectAll_import($file , ImportMembreRepository $ImportMembreRepository , EntityManagerInterface $em , ValleeRepository $valleeRepository , VillageRepository $villageRepository , GenreRepository $genreRepository , PersonneMembreRepository $personneMembreRepository){
-            $files = "C:/Users/Zosefa/Documents/GitHub/Back_MAFANA/CSV/".$file;
+            $files = "D:/GIT/Back_MAFANA/CSV/".$file;
             $importAll = $ImportMembreRepository->findAll();
             foreach($importAll as $importall){
                 $em->remove($importall);
