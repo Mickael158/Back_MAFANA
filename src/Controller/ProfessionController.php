@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_CRUD")'))]
+#[IsGranted(new Expression('is_granted("ROLE_ADMIN") or is_granted("ROLE_CRUD") or is_granted("ROLE_USER")'))]
     class ProfessionController extends AbstractController{
 
         #[Route('/api/Profession',name:'insetion_Profession',methods:'POST')]

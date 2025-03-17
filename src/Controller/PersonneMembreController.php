@@ -2,8 +2,12 @@
     namespace App\Controller;
 
 use App\Entity\DemandeFinancier;
+use App\Entity\Enfant;
+use App\Entity\Mariage;
 use App\Entity\PersonneMembre;
 use App\Entity\RestaurationMembre;
+use App\Entity\Telephone;
+use App\Entity\Users;
 use App\Repository\DemandeFinancierRepository;
 use App\Repository\PersonneMembreRepository;
 use App\Repository\VillageRepository;
@@ -14,6 +18,7 @@ use Lexik\Bundle\JWTAuthenticationBundle\Encoder\JWTEncoderInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -21,11 +26,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
     class PersonneMembreController extends AbstractController{
 
         #[Route('/api/Personne',name:'insetion_Personne',methods:'POST')]
-        public function inerer(Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository,PersonneMembreRepository $personneMembreRepository){
+        public function inerer(Request $request, EntityManagerInterface $em,VillageRepository $villageRepository, GenreRepository $genreRepository,PersonneMembreRepository $personneMembreRepository, UserPasswordHasherInterface $hasher){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
-            $result = $personneMembreRepository->getPersonneByNomPrenoms($data_decode['Nom'],$data_decode['Prenom']);
-            $resultEmail = $personneMembreRepository->getPersonneByEmail( $data_decode['Email']);
+            $result = $personneMembreRepository->getPersonneByNomPrenoms($data_decode['personne']['Nom'],$data_decode['personne']['Prenom']);
+            $resultEmail = $personneMembreRepository->getPersonneByEmail( $data_decode['personne']['Email']);
             if($result){
                 return $this->json(['error'=>'Cette personne est dejas ennregistrer!'],200,[]);
             }
@@ -33,22 +38,137 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 return $this->json(['error'=>'Cette email est dejas ennregistrer!'],200,[]);
             }else{
                 $Personne = new PersonneMembre();
-                $village = $villageRepository->find($data_decode['IdVillage']);
-                $genre = $genreRepository->find($data_decode['IdGenre']);
+                $village = $villageRepository->find($data_decode['personne']['IdVillage']);
+                $genre = $genreRepository->find($data_decode['personne']['IdGenre']);
                 $Personne
-                    ->setNomMembre($data_decode['Nom'])
-                    ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
-                    ->setAddress($data_decode['Adresse'])
-                    ->setEmail($data_decode['Email'])
-                    ->setTelephone($data_decode['Telephone'])
-                    ->setPrenomMembre($data_decode['Prenom'])
-                    ->setDateInscription(new \DateTime($data_decode['DateInscription']))
+                    ->setNomMembre($data_decode['personne']['Nom'])
+                    ->setDateDeNaissance(new \DateTime($data_decode['personne']['DateNaissance']))
+                    ->setAddress($data_decode['personne']['Adresse'])
+                    ->setAddressTana($data_decode['personne']['AdressTana'])
+                    ->setFokotany($data_decode['personne']['Fokotany'])
+                    ->setArrondissement($data_decode['personne']['Arrondissement'])
+                    ->setCIN($data_decode['personne']['CIN'])
+                    ->setEmail($data_decode['personne']['Email'])
+                    ->setPrenomMembre($data_decode['personne']['Prenom'])
+                    ->setDateInscription(new \DateTime($data_decode['personne']['DateInscription']))
                     ->setIdVillage($village)
                     ->setIdGenre($genre);
                 $em->persist($Personne);
                 $em->flush();
-                return $this->json(['message' => 'Personne inserer'], 200, []);
+                
+                $user = new Users();
+                $user
+                    ->setUsername($Personne->getEmail())
+                    ->setPassword($hasher->hashPassword($user,'000000'))
+                    ->setIdPersonne($Personne)
+                    ->setRoles(['ROLE_USER'])
+                    ;
+                $em->persist($user);
+                $em->flush();
+
+                $telephone = $data_decode['telephone'];
+
+                foreach ($telephone as $value) {
+                    $newTelephone = new Telephone();
+                    $newTelephone
+                        ->setIdPersonneMembre($Personne)
+                        ->setTelephone($value);
+                        $em->persist($newTelephone);
+                        $em->flush();
+                }
+
             }
+
+            $resultFemme = $personneMembreRepository->getPersonneByNomPrenoms($data_decode['femme']['Nom'],$data_decode['femme']['Prenom']);
+            $resultEmailFemme = $personneMembreRepository->getPersonneByEmail( $data_decode['femme']['Email']);
+            if($resultFemme){
+                return $this->json(['error'=>'Cette personne est dejas ennregistrer!'],200,[]);
+            }
+            else if($resultEmailFemme){
+                return $this->json(['error'=>'Cette email est dejas ennregistrer!'],200,[]);
+            }else{
+                $PersonneFemme = new PersonneMembre();
+                $village = $villageRepository->find($data_decode['personne']['IdVillage']);
+                $genre = $genreRepository->find($data_decode['personne']['IdGenre']);
+                $PersonneFemme
+                    ->setNomMembre($data_decode['femme']['Nom'])
+                    ->setDateDeNaissance(new \DateTime($data_decode['femme']['DateNaissance']))
+                    ->setAddress($data_decode['femme']['Adresse'])
+                    ->setAddressTana($data_decode['femme']['AdressTana'])
+                    ->setFokotany($data_decode['femme']['Fokotany'])
+                    ->setArrondissement($data_decode['femme']['Arrondissement'])
+                    ->setCIN($data_decode['femme']['CIN'])
+                    ->setEmail($data_decode['femme']['Email'])
+                    ->setPrenomMembre($data_decode['femme']['Prenom'])
+                    ->setDateInscription(new \DateTime($data_decode['femme']['DateInscription']))
+                    ->setIdVillage($village)
+                    ->setIdGenre($genre);
+                $em->persist($PersonneFemme);
+                $em->flush();
+
+                $telephonefemme = $data_decode['telephonesFemme'];
+
+                foreach ($telephonefemme as $value) {
+                    $newTelephoneFemme = new Telephone();
+                    $newTelephoneFemme
+                        ->setIdPersonneMembre($PersonneFemme)
+                        ->setTelephone($value);
+                        $em->persist($newTelephoneFemme);
+                        $em->flush();
+                }
+            }
+
+            $mariage = new Mariage();
+            $mariage 
+                ->setDateMariage(new \DateTime())
+                ->setIdMari($Personne)
+                ->setIdMarie($PersonneFemme);
+
+            $em->persist($mariage);
+            $em->flush();
+            
+
+            $enfant = $data_decode['enfant'];
+
+            foreach ($enfant as $value) {
+                $personneEnfant = new PersonneMembre();
+                $village = $villageRepository->find($value['IdVillage']);
+                $genre = $genreRepository->find($value['IdGenre']);
+                $personneEnfant
+                    ->setNomMembre($value['Nom'])
+                    ->setDateDeNaissance(new \DateTime($value['DateNaissance']))
+                    ->setAddress($value['Adresse'])
+                    ->setAddressTana($value['AdressTana'])
+                    ->setFokotany($value['Fokotany'])
+                    ->setArrondissement($value['Arrondissement'])
+                    ->setCIN($value['CIN'])
+                    ->setEmail($value['Email'])
+                    ->setPrenomMembre($value['Prenom'])
+                    ->setDateInscription(new \DateTime($value['DateInscription']))
+                    ->setIdVillage($village)
+                    ->setIdGenre($genre);
+                $em->persist($personneEnfant);
+                $em->flush();
+
+                $telephoneEnfant = $data_decode['telephonesFemme'];
+
+                foreach ($telephoneEnfant as $value) {
+                    $newTelephoneEnfant = new Telephone();
+                    $newTelephoneEnfant
+                        ->setIdPersonneMembre($personneEnfant)
+                        ->setTelephone($value);
+                        $em->persist($newTelephoneEnfant);
+                        $em->flush();
+                }
+
+                $enfantPersonne = new Enfant();
+                $enfantPersonne
+                    ->setIdEnfant($personneEnfant)
+                    ->setIdMariageParent($mariage);
+                    $em->persist($enfantPersonne);
+                    $em->flush();
+            }
+            return $this->json(['message' => 'personne inserer'],200,[]);
         }
 
         #[Route('/api/PersonneTest',name:'Test_Personne',methods:'POST')]
@@ -72,7 +192,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
                 ->setAddress($data_decode['Adresse'])
                 ->setEmail($data_decode['Email'])
-                ->setTelephone($data_decode['Telephone'])
                 ->setPrenomMembre($data_decode['Prenom'])
                 ->setIdVillage($village)
                 ->setIdGenre($genre);
@@ -175,7 +294,6 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
                 ->setDateDeNaissance(new \DateTime($data_decode['DateNaissance']))
                 ->setAddress($data_decode['Adresse'])
                 ->setEmail($data_decode['Email'])
-                ->setTelephone($data_decode['Telephone'])
                 ->setPrenomMembre($data_decode['Prenom'])
                 ->setDateInscription(new \DateTime())
                 ->setIdVillage($village)

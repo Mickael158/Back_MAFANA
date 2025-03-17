@@ -66,7 +66,10 @@ class AppFixtures extends Fixture
             ->setDateDeNaissance(new \DateTime('2004-10-28'))
             ->setDateInscription(new \DateTime())
             ->setEmail('zosephatoky@gmail.com')
-            ->setTelephone('0343562462')
+            ->setAddressTana("Adresse")
+            ->setFokotany("Fokotany")
+            ->setCIN("123456789456")
+            ->setArrondissement("1ere Arrodissement")
             ->setPrenomMembre('Toky')
             ->setIdVillage($idVillage[0])
             ->setIdGenre($idGenre[0]);
