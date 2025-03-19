@@ -47,10 +47,10 @@ class OffreEmploisController extends AbstractController
     }
 
     #[Route('',name:'_find',methods:'GET')]
-    public function getOffre(OffreEmploisRepository $offreEmploisRepository, SerializerInterface $serializer)
+    public function getOffre(OffreEmploisRepository $offreEmploisRepository)
     {
-        $offres = $offreEmploisRepository->findOffre($serializer);
-        return new JsonResponse($offres, 200, [], true);
+        $offres = $offreEmploisRepository->findOffre();
+        return $this->json($offres, 200 , []);
     }
 
     #[Route('/search',name:'_search',methods:'POST')]
@@ -58,7 +58,7 @@ class OffreEmploisController extends AbstractController
     {
         $data = $request->getContent();
         $data_decode = json_decode($data, true);
-            $offres = $offreEmploisRepository->findByTitreOrProfession($data_decode['data'],$data_decode['profession']);
-            return $this->json($offres,200, []);
+        $offres = $offreEmploisRepository->findByTitreOrProfession($data_decode['data'],$data_decode['profession']);
+        return $this->json($offres,200, []);
     }
 }

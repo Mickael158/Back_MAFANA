@@ -30,15 +30,16 @@ class UtilisateurController extends AbstractController
         
     }
     #[Route('/api/Utilisateurs',name:'insetion_Utilisateur',methods:'POST')]
-        public function inerer(Request $request, EntityManagerInterface $em,RoleRepository $roleRepository , PersonneMembreRepository $personneMembreRepository){
-            $Utilisateur = new Users();
+        public function inerer(Request $request, EntityManagerInterface $em,RoleRepository $roleRepository , PersonneMembreRepository $personneMembreRepository, UsersRepository $usersRepository){
             $data = $request->getContent();
             $data_decode = json_decode($data, true);
+            $Utilisateur = $usersRepository->findBy(["username" => $data_decode['username']])[0];
             $Role=$data_decode['Role'];
             $ListeRole = [];
-            $Personne = $personneMembreRepository->find($data_decode['idPersonne']);
+            foreach ($Utilisateur->getRoles() as $value) {
+                $ListeRole[] =  $value;
+            }
             $Utilisateur
-                ->setIdPersonne($Personne)
                 ->setUsername($data_decode['username'])
                 ->setPassword($this->hasher->hashPassword($Utilisateur, $data_decode['Password']));
             for($i=0;$i < count($Role);$i++){

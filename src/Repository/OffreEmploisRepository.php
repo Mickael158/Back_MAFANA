@@ -19,37 +19,82 @@ class OffreEmploisRepository extends ServiceEntityRepository
         parent::__construct($registry, OffreEmplois::class);
     }
 
-    public function findOffre(SerializerInterface $serializer)
+    public function findOffre()
 {
-    $offres = $this->createQueryBuilder('o')
-        ->select('o', 'p', 't')
-        ->leftJoin('o.PersonneMembre', 'p')
-        ->leftJoin('p.telephones', 't')
-        ->orderBy('o.DateOffre', 'DESC')
-        ->getQuery()
-        ->getResult();
-        
-        return $serializer->serialize($offres, 'json', ['groups' => 'personne_read']);
+    $sql = 'SELECT 
+        o.id, o.profession_id, o.personne_membre_id, o.description, o.date_offre, o.titre,
+        p.id AS personne_id, p.id_village_id, p.id_genre_id, p.nom_membre, p.date_de_naissance, 
+        p.address, p.email, p.prenom_membre, p.date_inscription, p.fokotany, p.address_tana, 
+        p.cin, p.arrondissement, pr.nom_profession,
+        STRING_AGG(t.telephone, \', \') AS telephones
+    FROM offre_emplois o
+    LEFT JOIN personne_membre p ON p.id = o.personne_membre_id
+    LEFT JOIN telephone t ON t.id_personne_membre_id = p.id
+    LEFT JOIN profession pr ON pr.id = o.profession_id
+    GROUP BY o.id, o.profession_id, o.personne_membre_id, o.description, o.date_offre, o.titre,
+             p.id, p.id_village_id, p.id_genre_id, p.nom_membre, p.date_de_naissance, 
+             p.address, p.email, p.prenom_membre, p.date_inscription, p.fokotany, p.address_tana, 
+             p.cin, p.arrondissement, pr.nom_profession
+    ORDER BY o.date_offre DESC';
+
+    $conn = $this->getEntityManager()->getConnection();
+    $stmt = $conn->prepare($sql);
+    $resultSet = $stmt->executeQuery();
+    
+    return $resultSet->fetchAllAssociative();
 }
 
 
-    public function findByTitreOrProfession(?string $titre, ?int $professionId): array
-    {
-        $entity = $this->find($professionId);
-        $qb = $this->createQueryBuilder('o');
 
-        if ($titre) {
-            $qb->orWhere('o.Titre LIKE :titre')
-               ->setParameter('titre', '%' . $titre . '%');
-        }
-
-        if ($entity) {
-            $qb->orWhere('o.Profession = :profession')
-               ->setParameter('profession', $professionId);
-        }
-
-        return $qb->getQuery()->getResult();
+public function findByTitreOrProfession(?string $titre, ?int $professionId): array
+{
+    $sql = 'SELECT 
+        o.id, o.profession_id, o.personne_membre_id, o.description, o.date_offre, o.titre,
+        p.id AS personne_id, p.id_village_id, p.id_genre_id, p.nom_membre, p.date_de_naissance, 
+        p.address, p.email, p.prenom_membre, p.date_inscription, p.fokotany, p.address_tana, 
+        p.cin, p.arrondissement, pr.nom_profession, 
+        STRING_AGG(t.telephone, \', \') AS telephones
+    FROM offre_emplois o
+    LEFT JOIN personne_membre p ON p.id = o.personne_membre_id
+    LEFT JOIN telephone t ON t.id_personne_membre_id = p.id
+    LEFT JOIN profession pr ON pr.id = o.profession_id';
+    
+    $conditions = [];
+    
+    if ($titre !== null && $titre !== '') {
+        $conditions[] = 'o.titre LIKE :titre';
     }
+    
+    if ($professionId !== null) {
+        $conditions[] = 'o.profession_id = :profession_id';
+    }
+    
+    if (!empty($conditions)) {
+        $sql .= ' WHERE ' . implode(' OR ', $conditions);
+    }
+    
+    $sql .= ' GROUP BY o.id, o.profession_id, o.personne_membre_id, o.description, o.date_offre, o.titre,
+              p.id, p.id_village_id, p.id_genre_id, p.nom_membre, p.date_de_naissance, 
+              p.address, p.email, p.prenom_membre, p.date_inscription, p.fokotany, p.address_tana, 
+              p.cin, p.arrondissement, pr.nom_profession
+              ORDER BY o.date_offre DESC';
+    
+    $conn = $this->getEntityManager()->getConnection();
+    $stmt = $conn->prepare($sql);
+    
+    if ($titre !== null && $titre !== '') {
+        $stmt->bindValue('titre', '%' . $titre . '%');
+    }
+    if ($professionId !== null) {
+        $stmt->bindValue('profession_id', $professionId);
+    }
+    
+    $resultSet = $stmt->executeQuery();
+    
+    return $resultSet->fetchAllAssociative();
+}
+
+
 
 
     //    /**

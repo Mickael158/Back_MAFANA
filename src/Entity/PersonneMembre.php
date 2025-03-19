@@ -68,14 +68,9 @@ class PersonneMembre
     #[Groups(['personne_read'])]
     private ?string $Arrondissement = null;
 
-    #[ORM\OneToMany(mappedBy: 'Id_Personne_Membre', targetEntity: Telephone::class, orphanRemoval: true)]
-    #[Groups(['personne_read'])]
-    private Collection $telephones;
-
 
     public function __construct()
     {
-        $this->telephones = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -225,30 +220,6 @@ class PersonneMembre
         $this->Arrondissement = $Arrondissement;
 
         return $this;
-    }
-    public function getTelephones(): Collection
-{
-    return $this->telephones;
-}
-
-public function addTelephones(Telephone $telephone): static
-{
-    if (!$this->telephones->contains($telephone)) {
-        $this->telephones->add($telephone);
-        $telephone->setIdPersonneMembre($this);
-    }
-    return $this;
-}
-
-public function removeTelephones(Telephone $telephone): static
-{
-    if ($this->telephones->removeElement($telephone)) {
-        // Set the owning side to null (unless already changed)
-        if ($telephone->getIdPersonneMembre() === $this) {
-            $telephone->setIdPersonneMembre(null);
-        }
-    }
-    return $this;
-}
+    } 
 
 }
